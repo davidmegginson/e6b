@@ -123,7 +123,6 @@ e6b.input = function () {
 window.onload = function () {
     window.addEventListener('click', e6b.input);
     window.addEventListener('keypress', e6b.input);
-    window.addEventListener('touchstart', e6b.input);
 
     e6b.nodes.question = document.getElementById("question");
     e6b.nodes.answer = document.getElementById("answer");
