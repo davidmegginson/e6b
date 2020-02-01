@@ -1,0 +1,22 @@
+body {
+    font-family: Helvetica, Arial, sanserif;
+}
+
+.instructions {
+    font-style: italic;
+    color: #aaaaaa;
+}
+
+#question, #answer {
+    font-size: 144%;
+}
+
+#question::before {
+    content: "Q: ";
+    font-weight: bold;
+}
+
+#answer::before {
+    content: "A: ";
+    font-weight: bold;
+}
