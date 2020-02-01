@@ -4,7 +4,7 @@ body {
 
 .instructions {
     font-style: italic;
-    color: #aaaaaa;
+    color: #333333;
 }
 
 #question, #answer {
