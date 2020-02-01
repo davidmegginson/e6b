@@ -76,7 +76,7 @@ e6b.questions.wind.headwind = function () {
     var params = e6b.wind_params();
     return [
         "Calculate headwind/tailwind: desired course " + params.track + "°, airspeed " + params.tas + " ktas, winds " + params.wind_dir + "@" + params.wind_speed + " kt.",
-        "There is a " + Math.abs(params.headwind) + (params.headwind < 0 ? "  kt tailwind component." : " kt headwind component.")
+        "There is a " + Math.abs(params.headwind) + (params.headwind < 0 ? " kt tailwind component." : " kt headwind component.")
     ];
 };
 
