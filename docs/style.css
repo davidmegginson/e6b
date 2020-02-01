@@ -9,14 +9,21 @@ body {
 
 #question, #answer {
     font-size: 144%;
+    margin-left: 1.5em;
 }
 
 #question::before {
-    content: "Q: ";
+    display: inline-block;
+    content: "Q:";
     font-weight: bold;
+    margin-left: -1.5em;
+    width: 1.5em;
 }
 
 #answer::before {
-    content: "A: ";
+    display: inline-block;
+    content: "A:";
     font-weight: bold;
+    margin-left: -1.5em;
+    width: 1.5em;
 }

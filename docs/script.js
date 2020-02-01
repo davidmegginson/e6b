@@ -51,15 +51,15 @@ e6b.wind_params = function () {
 e6b.questions.wind.wind = function () {
     var params = e6b.wind_params();
     return [
-        "Calculate actual winds: track " + params.track + "°, heading " + params.heading + "°, " + params.tas + " kt TAS, " + params.gs + " kt GS.",
-        "Winds are from " + params.wind_dir + "° @ " + params.wind_speed + " kt."
+        "Calculate actual winds: track " + params.track + "°, heading " + params.heading + "°, " + params.tas + " kt TAS, " + params.gs + " kt GS.",
+        "Winds are from " + params.wind_dir + "° @ " + params.wind_speed + " kt."
     ];
 };
 
 e6b.questions.wind.heading = function () {
     var params = e6b.wind_params();
     return [
-        "Calculate heading: desired course " + params.track + "°, airspeed " + params.tas + " ktas, winds " + params.wind_dir + "@" + params.wind_speed + " kt.",
+        "Calculate heading: desired course " + params.track + "°, airspeed " + params.tas + " ktas, winds " + params.wind_dir + "@" + params.wind_speed + " kt.",
         "Required heading is " + params.heading + "°."
     ];
 };
@@ -67,24 +67,24 @@ e6b.questions.wind.heading = function () {
 e6b.questions.wind.groundspeed = function () {
     var params = e6b.wind_params();
     return [
-        "Calculate groundspeed: desired course " + params.track + "°, airspeed " + params.tas + " ktas, winds " + params.wind_dir + "@" + params.wind_speed + " kt.",
-        "Groundspeed is " + params.gs + " kt."
+        "Calculate groundspeed: desired course " + params.track + "°, airspeed " + params.tas + " ktas, winds " + params.wind_dir + "@" + params.wind_speed + " kt.",
+        "Groundspeed is " + params.gs + " kt."
     ];
 };
 
 e6b.questions.wind.headwind = function () {
     var params = e6b.wind_params();
     return [
-        "Calculate headwind/tailwind: desired course " + params.track + "°, airspeed " + params.tas + " ktas, winds " + params.wind_dir + "@" + params.wind_speed + " kt.",
-        "There is a " + Math.abs(params.headwind) + (params.headwind < 0 ? "  kt tailwind component." : " kt headwind component.")
+        "Calculate headwind/tailwind: desired course " + params.track + "°, airspeed " + params.tas + " ktas, winds " + params.wind_dir + "@" + params.wind_speed + " kt.",
+        "There is a " + Math.abs(params.headwind) + (params.headwind < 0 ? "  kt tailwind component." : " kt headwind component.")
     ];
 };
 
 e6b.questions.wind.crosswind = function () {
     var params = e6b.wind_params();
     return [
-        "Calculate crosswind: " + params.track + "°, airspeed " + params.tas + " ktas, winds " + params.wind_dir + "@" + params.wind_speed + " kt.",
-        "The crosswind is " + Math.abs(params.headwind) + " kt from the " + (params.crosswind < 0 ? "left." : "right.")
+        "Calculate crosswind: " + params.track + "°, airspeed " + params.tas + " ktas, winds " + params.wind_dir + "@" + params.wind_speed + " kt.",
+        "The crosswind is " + Math.abs(params.headwind) + " kt from the " + (params.crosswind < 0 ? "left." : "right.")
     ];
 };
 
@@ -166,18 +166,18 @@ e6b.questions.calc.speedTimeDistance = function () {
     switch (e6b.rand(0, 3)) {
     case 0:
         return [
-            "How far will you travel at " + speed + " kt for " + e6b.time(time) + "?",
-            "" + distance + " nm"
+            "How far will you travel at " + speed + " kt for " + e6b.time(time) + "?",
+            "" + distance + " nm"
         ];
     case 1:
         return [
-            "How long will it take to travel " + distance + " nm at " + speed + " kt?",
+            "How long will it take to travel " + distance + " nm at " + speed + " kt?",
             "" + e6b.time(time)
         ];
     default:
         return [
-            "How fast are you going if you cover " + distance + " nm in " + e6b.time(time) + "?",
-            "" + speed + " kt"
+            "How fast are you going if you cover " + distance + " nm in " + e6b.time(time) + "?",
+            "" + speed + " kt"
         ];
     }
 };
