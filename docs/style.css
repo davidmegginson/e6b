@@ -27,3 +27,17 @@ body {
     margin-left: -1.5em;
     width: 1.5em;
 }
+
+#e6b-photo {
+    float: right;
+    max-width: 33vw;
+}
+
+#e6b-photo img {
+    max-width: 33vw;
+}
+
+#e6b-photo figcaption {
+    font-size: 80%;
+    font-style: italic;
+}
