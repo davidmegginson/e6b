@@ -22,7 +22,7 @@ var e6b = {
 
 
 /**
- * Generate random parameters for any wind problem.
+ * Generate random parameters for a wind problem.
  */
 e6b.gen_wind_params = function () {
     var params = {};
@@ -117,102 +117,207 @@ e6b.problems.wind.crosswind = function () {
 
 
 /**
- * Calculator problems: convert volume units.
+ * Generate random parameters for a distance/speed/time problem.
  */
-e6b.problems.calc.volumeUnits = function () {
-    var gallons = e6b.rand(3, 150);
-    var litres = Math.floor(gallons * 3.78541);
-    switch (e6b.rand(0, 2)) {
-    case 0:
-        return [
-            "Convert " + gallons + " US gallons to litres.",
-            "" + litres + " litres"
-        ];
-    default:
-        return [
-            "Convert " + litres + " litres to US gallons.",
-            "" + gallons + " gallons"
-        ];
-    }
+e6b.gen_dst_params = function () {
+    var params = {};
+    params.speed = e6b.rand(60, 300);
+    params.time = e6b.rand(5, 180);
+    params.dist = Math.round(params.speed / 60.0 * params.time);
+    params.time = e6b.to_hours(params.time);
+    return params;
 };
 
 
 /**
- * Calculator problems: convert distance units.
+ * Calculator problem: speed from distance and time
  */
-e6b.problems.calc.distanceUnits = function () {
-    var units = ['nautical miles', 'statue miles', 'kilometers'];
-    var values = [];
-    values [0] = e6b.rand(10, 300);
-    values [1] = Math.round(values[0] * 1.15078);
-    values [2] = Math.round(values[0] * 1.852);
-
-    var k1 = e6b.rand(0, 3);
-    var k2;
-    do {
-        k2 = e6b.rand(0, 3);
-    } while (k2 == k1);
-
+e6b.problems.calc.speed = function () {
+    var params = e6b.gen_dst_params();
     return [
-        "Convert " + values[k1] + " " + units[k1] + " to " + units[k2] + ".",
-        "" + values[k2] + " " + units[k2]
+        "How fast are you going if you travel " + params.dist + " nautical miles in " + params.time + "?",
+        "" + params.speed + " knots"
     ];
 };
 
 
 /**
- * Calculator problems: calculate fuel/time/distance.
+ * Calculator problem: time from speed and distance
  */
-e6b.problems.calc.fuelTimeDistance = function () {
-    var fuel_burn = e6b.rand(50, 300) / 10.0;
-    var time = e6b.rand(5, 180);
-    var gallons = Math.round(fuel_burn / 6.0 * time) / 10.0;
-
-    switch (e6b.rand(0, 3)) {
-    case 0:
-        return [
-            "How much fuel will you burn at " + fuel_burn + " gal/hr for " + e6b.to_hours(time) + "?",
-            "" + gallons + " gal"
-        ];
-    case 1:
-        return [
-            "How long can you fly with " + gallons + " gal at " + fuel_burn + " gal/hr?",
-            "" + e6b.to_hours(time)
-        ];
-    default:
-        return [
-            "What is your fuel consumption using " + gallons + " gal in " + e6b.to_hours(time) + "?",
-            "" + fuel_burn + " gal/hr"
-        ];
-    }
+e6b.problems.calc.time = function () {
+    var params = e6b.gen_dst_params();
+    return [
+        "How long will it take to travel " + params.dist + " nautical miles at " + params.speed + " knots?",
+        params.time
+    ];
 };
 
 
 /**
- * Calculator problems: calculate speed/time/distance.
+ * Calculator problem: distance from speed and time
  */
-e6b.problems.calc.speedTimeDistance = function () {
-    var speed = e6b.rand(60, 300);
-    var time = e6b.rand(5, 180);
-    var distance = Math.round(speed / 60.0 * time);
+e6b.problems.calc.dist = function () {
+    var params = e6b.gen_dst_params();
+    return [
+        "How far can you travel in " + params.time + " at " + params.speed + " knots?",
+        "" + params.dist + " nautical miles"
+    ];
+};
 
-    switch (e6b.rand(0, 3)) {
+
+/**
+ * Generate random parameters for a burn/endurance/fuel problem.
+ */
+e6b.gen_bef_params = function () {
+    var params = {};
+    params.burn = e6b.rand(50, 300) / 10.0; // one decimal place
+    params.endurance = e6b.rand(5, 180);
+    params.fuel = Math.round(params.burn / 6.0 * params.endurance) / 10.0;
+    params.endurance = e6b.to_hours(params.endurance);
+    return params;
+};
+
+
+/**
+ * Calculator problem: fuel burn from fuel and endurance.
+ */
+e6b.problems.calc.burn = function () {
+    params = e6b.gen_bef_params();
+    return [
+        "What is your fuel burn if you use " + params.fuel + " gallons in " + params.endurance + "?",
+        "" + params.burn + " gallons per hour"
+    ];
+};
+
+
+/**
+ * Calculator problem: fuel from fuel burn and endurance.
+ */
+e6b.problems.calc.fuel = function () {
+    params = e6b.gen_bef_params();
+    return [
+        "How much fuel will you use in " + params.endurance + " at " + params.burn + " gallons per hour?",
+        "" + params.fuel + " gallons"
+    ];
+};
+
+
+/**
+ * Calculator problem: endurance from fuel and fuel burn.
+ */
+e6b.problems.calc.burn = function () {
+    params = e6b.gen_bef_params();
+    return [
+        "How long can you fly with " + params.fuel + " gallons of fuel, burning " + params.burn + " gallons per hour?",
+        params.endurance
+    ];
+};
+
+
+/**
+ * Generate random parameters for a volume problem.
+ */
+e6b.gen_vol_params = function () {
+    var params = {};
+    params.gallons = e6b.rand(30, 1500) / 10.0; // one decimal place
+    params.litres = Math.round(params.gallons * 3.78541);
+    return params;
+};
+
+
+/**
+ * Calculator problem: convert US gallons to litres.
+ */
+e6b.problems.calc.litres = function () {
+    var params = e6b.gen_vol_params();
+    return [
+        "Convert " + params.gallons + " US gallons to litres.",
+        "" + params.litres + " litres"
+    ];
+};
+
+
+/**
+ * Calculator problem: convert litres to US gallons.
+ */
+e6b.problems.calc.gallons = function () {
+    var params = e6b.gen_vol_params();
+    return [
+        "Convert " + params.litres + " litres to US gallons.",
+        "" + params.gallons + " US gallons"
+    ];
+};
+
+
+/**
+ * Generate random parameters for a distance problem.
+ */
+e6b.gen_dist_params = function () {
+    var params = {};
+    params.nm = e6b.rand(10, 300);
+    params.sm = Math.round(params.nm * 1.15078);
+    params.km = Math.round(params.nm * 1.852);
+    return params;
+};
+
+
+/**
+ * Calculator problem: convert statue miles or kilometers to nautical miles
+ */
+e6b.problems.calc.nm = function () {
+    var params = e6b.gen_dist_params();
+    switch (e6b.rand(0, 2)) {
     case 0:
         return [
-            "How far will you travel at " + speed + " kt for " + e6b.to_hours(time) + "?",
-            "" + distance + " nm"
-        ];
-    case 1:
-        return [
-            "How long will it take to travel " + distance + " nm at " + speed + " kt?",
-            "" + e6b.to_hours(time)
+            "Convert " + params.sm + " statute miles to nautical miles.",
+            "" + params.nm + " nautical miles"
         ];
     default:
         return [
-            "How fast are you going if you cover " + distance + " nm in " + e6b.to_hours(time) + "?",
-            "" + speed + " kt"
+            "Convert " + params.km + " kilometers to nautical miles.",
+            "" + params.nm + " nautical miles"
         ];
-    }
+    };
+};
+
+
+/**
+ * Calculator problem: convert nautical miles or kilometers to statute miles
+ */
+e6b.problems.calc.sm = function () {
+    var params = e6b.gen_dist_params();
+    switch (e6b.rand(0, 2)) {
+    case 0:
+        return [
+            "Convert " + params.nm + " nautical miles to statute miles.",
+            "" + params.sm + " statute miles"
+        ];
+    default:
+        return [
+            "Convert " + params.km + " kilometers to statute miles.",
+            "" + params.sm + " statute miles"
+        ];
+    };
+};
+
+
+/**
+ * Calculator problem: convert nautical miles or kilometers to statute miles
+ */
+e6b.problems.calc.km = function () {
+    var params = e6b.gen_dist_params();
+    switch (e6b.rand(0, 2)) {
+    case 0:
+        return [
+            "Convert " + params.nm + " nautical miles to kilometers.",
+            "" + params.km + " kilometers"
+        ];
+    default:
+        return [
+            "Convert " + params.sm + " statute miles to kilometers.",
+            "" + params.km + " kilometers"
+        ];
+    };
 };
 
 
