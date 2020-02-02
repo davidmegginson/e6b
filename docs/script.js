@@ -32,7 +32,6 @@ e6b.gen_wind_params = function () {
     params.wind_speed = e6b.rand(5, 40);
 
     var delta = params.wind_dir - params.track;
-
     var cos = Math.cos(delta * (Math.PI / 180.0));
     var sin = Math.sin(delta * (Math.PI / 180.0));
     params.headwind = Math.round(params.wind_speed * cos);
@@ -103,8 +102,8 @@ e6b.problems.wind.headwind = function () {
 e6b.problems.wind.crosswind = function () {
     var params = e6b.gen_wind_params();
     return [
-        "Calculate crosswind: " + params.track + "°, airspeed " + params.tas + " kt TAS, winds " + params.wind_dir + "@" + params.wind_speed + " kt.",
-        "The crosswind is " + Math.abs(params.headwind) + " kt from the " + (params.crosswind < 0 ? "left." : "right.")
+        "Calculate crosswind: track " + params.track + "°, airspeed " + params.tas + " kt TAS, winds " + params.wind_dir + "@" + params.wind_speed + " kt.",
+        "The crosswind is " + Math.abs(params.crosswind) + " kt from the " + (params.crosswind < 0 ? "left." : "right.")
     ];
 };
 
@@ -318,6 +317,90 @@ e6b.problems.calc.km = function () {
             "" + params.km + " kilometers"
         ];
     };
+};
+
+
+/**
+ * Calculator problem: fuel weight
+ */
+e6b.problems.calc.fuelweight = function () {
+    var gallons = e6b.rand(5, 150);
+    var lb = Math.round(gallons * 6.01);
+    switch (e6b.rand(0, 2)) {
+    case 0:
+        return [
+            "How much do " + gallons + " US gallons of avgas weigh at ISA sea level (in pounds)?",
+            "" + lb + " pounds"
+        ];
+    default:
+        return [
+            "How much avgas weighs " + lb + " pounds at ISA sea level (in US gallons)?",
+            "" + gallons + " US gallons"
+        ];
+    }
+};
+
+
+/**
+ * Calculator problem: weight
+ */
+e6b.problems.calc.weight = function () {
+    var lb = e6b.rand(10, 300);
+    var kg = Math.round(lb / 2.205);
+    switch (e6b.rand(0, 2)) {
+    case 0:
+        return [
+            "Convert " + lb + " pounds to kilograms.",
+            "" + kg + " kilograms"
+        ];
+    default:
+        return [
+            "Convert " + kg + " kilograms to pounds.",
+            "" + lb + " pounds"
+        ];
+    }
+};
+
+
+/**
+ * Calculator problem: length
+ */
+e6b.problems.calc.length = function () {
+    var feet = e6b.rand(1, 80) * 100;
+    var metres = Math.round(feet / 3.281);
+    switch (e6b.rand(0, 2)) {
+    case 0:
+        return [
+            "Convert " + feet + " feet to metres.",
+            "" + metres + " metres"
+        ];
+    default:
+        return [
+            "Convert " + metres + " metres to feet.",
+            "" + feet + " feet"
+        ];
+    }
+};
+
+
+/**
+ * Calculator problem: temperature
+ */
+e6b.problems.calc.temperature = function () {
+    var celsius = e6b.rand(-40, 40);
+    var fahrenheit = Math.round(celsius * (9.0 / 5) + 32);
+    switch (e6b.rand(0, 2)) {
+    case 0:
+        return [
+            "Convert " + celsius + "° celsius to fahrenheit.",
+            "" + fahrenheit + "° fahrenheit"
+        ];
+    default:
+        return [
+            "Convert " + fahrenheit + "° fahrenheit to celsius.",
+            "" + celsius + "° celsius"
+        ];
+    }
 };
 
 
