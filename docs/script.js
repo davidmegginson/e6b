@@ -254,6 +254,29 @@ e6b.problems.calc.true_airspeed = function () {
 
 
 /**
+ * Calculator problem: true altitude
+ */
+e6b.problems.calc.true_altitude = function () {
+    // nearest 100
+    var station_elev = e6b.rand(0, 50) * 100;
+    // nearest 1000
+    var pressure_alt = Math.round(station_elev / 1000) * 1000 + e6b.rand(0, 15) * 1000;
+    // ISA temperature
+    var isa_temp = Math.round(15 - (pressure_alt / 1000 * 1.98));
+    // randomised delta temperature
+    var delta_temp = e6b.rand(-20, 20);
+    // actual temperature
+    var oat = isa_temp + delta_temp;
+    // true altitude
+    var true_alt = Math.round(pressure_alt + ((pressure_alt - station_elev) / 1000 * delta_temp * 4));
+    return [
+	"Calculate true altitude for station elevation " + station_elev + " ft MSL, pressure altitude " + pressure_alt + " ft, OAT " + oat + "c.",
+	"True altitude is " + true_alt + " ft"
+    ];
+};
+
+ 
+/**
  * Generate random parameters for a volume problem.
  */
 e6b.gen_vol_params = function () {
