@@ -221,8 +221,8 @@ e6b.gen_density_alt = function () {
     var params = {};
     var oat_offset = e6b.rand(20, -20);
     params.palt = e6b.rand(1, 18) * 1000;
-    params.oat = 15 - (params.palt * 2 / 1000) + oat_offset;
-    params.dalt = params.palt + (oat_offset * 120);
+    params.oat = Math.round(15 - (params.palt * 1.98 / 1000) + oat_offset);
+    params.dalt = Math.round((params.palt + (oat_offset * 118.8)) /100) * 100;
     params.cas = e6b.rand(70, 250);
     params.tas = Math.round(params.cas + (params.cas * (0.02 * (params.dalt / 1000))));
     return params;
