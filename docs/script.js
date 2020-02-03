@@ -205,10 +205,50 @@ e6b.problems.calc.fuel = function () {
  * Calculator problem: endurance from fuel and fuel burn.
  */
 e6b.problems.calc.burn = function () {
-    params = e6b.gen_bef_params();
+    var params = e6b.gen_bef_params();
     return [
         "How long can you fly with " + params.fuel + " gallons of fuel, burning " + params.burn + " gallons per hour?",
         params.endurance
+    ];
+};
+
+
+/**
+ * Generate random parameters for a density-altitude problem.
+ */
+e6b.gen_density_alt = function () {
+    // FIXME - not the real formulas
+    var params = {};
+    var oat_offset = e6b.rand(20, -20);
+    params.palt = e6b.rand(1, 18) * 1000;
+    params.oat = 15 - (params.palt * 2 / 1000) + oat_offset;
+    params.dalt = params.palt + (oat_offset * 120);
+    params.cas = e6b.rand(70, 250);
+    params.tas = Math.round(params.cas + (params.cas * (0.02 * (params.dalt / 1000))));
+    return params;
+};
+
+
+/**
+ * Calculator problem: density altitude from pressure altitude and OAT.
+ */
+e6b.problems.calc.density_alt = function () {
+    var params = e6b.gen_density_alt();
+    return [
+        "Calculate the density altitude for pressure altitude " + params.palt + " ft and OAT " + params.oat + "°C.",
+        "" + params.dalt + " ft density altitude"
+    ];
+};
+
+
+/**
+ * Calculator problem: TAS from CAS, pressure altitude, and OAT
+ */
+e6b.problems.calc.true_airspeed = function () {
+    var params = e6b.gen_density_alt();
+    return [
+        "Calculate true airspeed for " + params.cas + " kt CAS, " + params.palt + " ft pressure altitude, " + params.oat + "°c OAT.",
+        "" + params.tas + " kt TAS"
     ];
 };
 
