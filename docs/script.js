@@ -54,8 +54,18 @@ e6b.gen_wind_params = function () {
 e6b.problems.wind.wind = function () {
     var params = e6b.gen_wind_params();
     return [
-        "Calculate actual winds: track " + params.track + "°, heading " + params.heading + "°, " + params.tas + " kt TAS, " + params.gs + " kt GS.",
-        "Winds are from " + params.wind_dir + "° @ " + params.wind_speed + " kt."
+        "Calculate actual winds: track "
+	    + params.track
+	    + "°, heading "
+	    + params.heading
+	    + "°, " + params.tas
+	    + " kt TAS, "
+	    + e6b.num(params.gs, 'kt GS.'),
+        "Winds are from "
+	    + params.wind_dir
+	    + "° @ "
+	    + params.wind_speed
+	    + " kt."
     ];
 };
 
@@ -66,8 +76,17 @@ e6b.problems.wind.wind = function () {
 e6b.problems.wind.heading = function () {
     var params = e6b.gen_wind_params();
     return [
-        "Calculate heading: desired course " + params.track + "°, airspeed " + params.tas + " kt TAS, winds " + params.wind_dir + "@" + params.wind_speed + " kt.",
-        "Required heading is " + params.heading + "°."
+        "Calculate heading: desired course "
+	    + params.track
+	    + "°, airspeed "
+	    + e6b.num(params.tas, 'kt TAS')
+	    + ", winds "
+	    + params.wind_dir
+	    + "@"
+	    + e6b.num(params.wind_speed, 'kt.'),
+        "Required heading is "
+	    + params.heading
+	    + "°."
     ];
 };
 
@@ -78,8 +97,16 @@ e6b.problems.wind.heading = function () {
 e6b.problems.wind.groundspeed = function () {
     var params = e6b.gen_wind_params();
     return [
-        "Calculate groundspeed: desired course " + params.track + "°, airspeed " + params.tas + " kt TAS, winds " + params.wind_dir + "@" + params.wind_speed + " kt.",
-        "Groundspeed is " + params.gs + " kt."
+        "Calculate groundspeed: desired course "
+	    + params.track
+	    + "°, airspeed "
+	    + params.tas
+	    + " kt TAS, winds "
+	    + params.wind_dir
+	    + "@"
+	    + e6b.num(params.wind_speed, 'kt'),
+        "Groundspeed is "
+	    + e6b.num(params.gs, 'kt')
     ];
 };
 
@@ -235,8 +262,13 @@ e6b.gen_density_alt = function () {
 e6b.problems.calc.density_alt = function () {
     var params = e6b.gen_density_alt();
     return [
-        "Calculate the density altitude for pressure altitude " + params.palt + " ft and OAT " + params.oat + "°C.",
-        "" + params.dalt + " ft density altitude"
+        "Calculate the density altitude for pressure altitude "
+	    + e6b.num(params.palt, 'ft')
+	    + " and OAT "
+	    + e6b.num(params.oat)
+	    + "°C.",
+        e6b.num(params.dalt, "ft")
+	    + " density altitude"
     ];
 };
 
@@ -478,6 +510,18 @@ e6b.problems.calc.temperature = function () {
  */
 e6b.rand = function(min, max) {
     return Math.floor(Math.random() * (max - min) + min)
+};
+
+
+/**
+ * Format a number in the current locale string, and optionally add units.
+ */
+e6b.num = function (n, unit) {
+    var s = n.toLocaleString();
+    if (unit) {
+	s += "\xa0" + unit;
+    }
+    return s;
 };
 
 
