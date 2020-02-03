@@ -161,8 +161,12 @@ e6b.gen_dst_params = function () {
 e6b.problems.calc.speed = function () {
     var params = e6b.gen_dst_params();
     return [
-        "How fast are you going if you travel " + params.dist + " nautical miles in " + params.time + "?",
-        "" + params.speed + " knots"
+        "Calculate groundspeed after flying "
+            + e6b.num(params.dist, "nautical miles")
+            + " in "
+            + params.time
+            + "?",
+        e6b.num(params.speed, "knots groundspeed")
     ];
 };
 
@@ -173,7 +177,11 @@ e6b.problems.calc.speed = function () {
 e6b.problems.calc.time = function () {
     var params = e6b.gen_dst_params();
     return [
-        "How long will it take to travel " + params.dist + " nautical miles at " + params.speed + " knots?",
+        "Calculate time to fly "
+            + e6b.num(params.dist, "nautical miles")
+            + " at "
+            + e6b.num(params.speed, "knots")
+            + ".",
         params.time
     ];
 };
@@ -185,8 +193,12 @@ e6b.problems.calc.time = function () {
 e6b.problems.calc.dist = function () {
     var params = e6b.gen_dst_params();
     return [
-        "How far can you travel in " + params.time + " at " + params.speed + " knots?",
-        "" + params.dist + " nautical miles"
+        "Calculate distance traveled in "
+            + params.time
+            + " at "
+            + e6b.num(params.speed, "knots")
+            + ".",
+        e6b.num(params.dist, "nautical miles")
     ];
 };
 
@@ -222,8 +234,12 @@ e6b.problems.calc.burn = function () {
 e6b.problems.calc.fuel = function () {
     params = e6b.gen_bef_params();
     return [
-        "How much fuel will you use in " + params.endurance + " at " + params.burn + " gallons per hour?",
-        "" + params.fuel + " gallons"
+        "Calculate fuel used in "
+            + params.endurance
+            + " at "
+            + e6b.num(params.burn, 'gallons/hour')
+            + ".",
+        e6b.num(params.fuel, 'gallons')
     ];
 };
 
@@ -234,7 +250,11 @@ e6b.problems.calc.fuel = function () {
 e6b.problems.calc.burn = function () {
     var params = e6b.gen_bef_params();
     return [
-        "How long can you fly with " + params.fuel + " gallons of fuel, burning " + params.burn + " gallons per hour?",
+        "Calculate your endurance with "
+            + e6b.num(params.fuel, 'gallons')
+            + " burning "
+            + e6b.num(params.burn, "gallons per hour")
+            + ".",
         params.endurance
     ];
 };
@@ -249,7 +269,7 @@ e6b.gen_density_alt = function () {
     var oat_offset = e6b.rand(20, -20);
     params.palt = e6b.rand(1, 18) * 1000;
     params.oat = Math.round(15 - (params.palt * 1.98 / 1000) + oat_offset);
-    params.dalt = Math.round((params.palt + (oat_offset * 118.8)) /100) * 100;
+    params.dalt = Math.round(params.palt + (oat_offset * 118.8));
     params.cas = e6b.rand(70, 250);
     params.tas = Math.round(params.cas + (params.cas * (0.02 * (params.dalt / 1000))));
     return params;
@@ -262,13 +282,12 @@ e6b.gen_density_alt = function () {
 e6b.problems.calc.density_alt = function () {
     var params = e6b.gen_density_alt();
     return [
-        "Calculate the density altitude for pressure altitude "
-	    + e6b.num(params.palt, 'ft')
-	    + " and OAT "
+        "Calculate density altitude for "
+	    + e6b.num(params.palt, 'feet pressure altitude')
+	    + " and "
 	    + e6b.num(params.oat)
-	    + "°C.",
-        e6b.num(params.dalt, "ft")
-	    + " density altitude"
+	    + "°C outside air temperature.",
+        e6b.num(Math.round(params.dalt/100)*100, "feet density altitude")
     ];
 };
 
@@ -279,8 +298,14 @@ e6b.problems.calc.density_alt = function () {
 e6b.problems.calc.true_airspeed = function () {
     var params = e6b.gen_density_alt();
     return [
-        "Calculate true airspeed for " + params.cas + " kt CAS, " + params.palt + " ft pressure altitude, " + params.oat + "°c OAT.",
-        "" + params.tas + " kt TAS"
+        "Calculate true airspeed for "
+            + e6b.num(params.cas, 'knots')
+            + " calibrated airspeed, "
+            + e6b.num(params.palt, 'feet')
+            + " pressure altitude, "
+            + e6b.num(params.oat)
+            + "°C outside air temperature.",
+        e6b.num(params.tas, 'knots true airspeed')
     ];
 };
 
@@ -302,8 +327,14 @@ e6b.problems.calc.true_altitude = function () {
     // true altitude
     var true_alt = Math.round(pressure_alt + ((pressure_alt - station_elev) / 1000 * delta_temp * 4));
     return [
-	"Calculate true altitude for station elevation " + station_elev + " ft MSL, pressure altitude " + pressure_alt + " ft, OAT " + oat + "c.",
-	"True altitude is " + true_alt + " ft"
+	"Calculate true altitude for station elevation "
+            + e6b.num(station_elev, 'feet MSL')
+            + ", "
+            + e6b.num(pressure_alt, 'feet pressure altitude')
+            + ", "
+            + e6b.num(oat)
+            + "°C outside air temperature.",
+	e6b.num(true_alt, 'feet true altitude')
     ];
 };
 
@@ -320,24 +351,26 @@ e6b.gen_vol_params = function () {
 
 
 /**
- * Calculator problem: convert US gallons to litres.
+ * Calculator problem: convert gallons to litres.
  */
 e6b.problems.calc.litres = function () {
     var params = e6b.gen_vol_params();
     return [
-        "Convert " + params.gallons + " US gallons to litres.",
-        "" + params.litres + " litres"
+        "Convert "
+            + e6b.num(params.gallons, 'gallons')
+            + " to litres.",
+        e6b.num(params.litres, 'litres')
     ];
 };
 
 
 /**
- * Calculator problem: convert litres to US gallons.
+ * Calculator problem: convert litres to gallons.
  */
 e6b.problems.calc.gallons = function () {
     var params = e6b.gen_vol_params();
     return [
-        "Convert " + params.litres + " litres to US gallons.",
+        "Convert " + params.litres + " litres to gallons.",
         "" + params.gallons + " US gallons"
     ];
 };
@@ -424,13 +457,17 @@ e6b.problems.calc.fuelweight = function () {
     switch (e6b.rand(0, 2)) {
     case 0:
         return [
-            "How much do " + gallons + " US gallons of avgas weigh at ISA sea level (in pounds)?",
-            "" + lb + " pounds"
+            "Calculate weight in pounds of "
+                + e6b.num(gallons, 'gallons')
+                + " of avgas at ISA sea level.",
+            e6b.num(lb, 'pounds')
         ];
     default:
         return [
-            "How much avgas weighs " + lb + " pounds at ISA sea level (in US gallons)?",
-            "" + gallons + " US gallons"
+            "Calculate volume in gallons of "
+                + e6b.num(lb, 'pounds')
+                + " of avgas at ISA sea level.",
+            e6b.num(gallons, "gallons")
         ];
     }
 };
@@ -466,13 +503,17 @@ e6b.problems.calc.length = function () {
     switch (e6b.rand(0, 2)) {
     case 0:
         return [
-            "Convert " + feet + " feet to metres.",
-            "" + metres + " metres"
+            "Convert "
+                + e6b.num(feet, 'feet')
+                + " to metres.",
+            e6b.num(metres, 'metres')
         ];
     default:
         return [
-            "Convert " + metres + " metres to feet.",
-            "" + feet + " feet"
+            "Convert "
+                + e6b.num(metres, 'metres')
+                + " to feet.",
+            e6b.num(feet, 'feet')
         ];
     }
 };
