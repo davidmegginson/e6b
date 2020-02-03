@@ -150,7 +150,7 @@ e6b.gen_dst_params = function () {
     params.speed = e6b.rand(60, 300);
     params.time = e6b.rand(5, 180);
     params.dist = Math.round(params.speed / 60.0 * params.time);
-    params.time = e6b.to_hours(params.time);
+    params.time = e6b.time(params.time);
     return params;
 };
 
@@ -211,7 +211,7 @@ e6b.gen_bef_params = function () {
     params.burn = e6b.rand(50, 300) / 10.0; // one decimal place
     params.endurance = e6b.rand(5, 180);
     params.fuel = Math.round(params.burn / 6.0 * params.endurance) / 10.0;
-    params.endurance = e6b.to_hours(params.endurance);
+    params.endurance = e6b.time(params.endurance);
     return params;
 };
 
@@ -268,10 +268,11 @@ e6b.gen_density_alt = function () {
     var params = {};
     var oat_offset = e6b.rand(20, -20);
     params.palt = e6b.rand(1, 18) * 1000;
-    params.oat = Math.round(15 - (params.palt * 1.98 / 1000) + oat_offset);
-    params.dalt = Math.round(params.palt + (oat_offset * 118.8));
+    params.oat = 15 - (params.palt * 1.98 / 1000) + oat_offset;
+    params.dalt = e6b.density_altitude(params.palt, params.oat);
     params.cas = e6b.rand(70, 250);
     params.tas = Math.round(params.cas + (params.cas * (0.02 * (params.dalt / 1000))));
+    params.oat = Math.round(params.oat);
     return params;
 };
 
@@ -555,6 +556,15 @@ e6b.rand = function(min, max) {
 
 
 /**
+ * Choose a random item from an object/dict
+ */
+e6b.rand_item = function (obj) {
+    var keys = Object.keys(obj);
+    return obj[keys[keys.length * Math.random() << 0]];
+};
+
+
+/**
  * Format a number in the current locale string, and optionally add units.
  */
 e6b.num = function (n, unit) {
@@ -567,18 +577,9 @@ e6b.num = function (n, unit) {
 
 
 /**
- * Choose a random item from an object/dict
- */
-e6b.rand_item = function (obj) {
-    var keys = Object.keys(obj);
-    return obj[keys[keys.length * Math.random() << 0]];
-};
-
-
-/**
  * Display minutes as HH:MM
  */
-e6b.to_hours = function(minutes) {
+e6b.time = function(minutes) {
     var h = Math.floor(minutes / 60);
     var m = minutes % 60;
     if (m < 10) {
@@ -620,6 +621,18 @@ e6b.input = function () {
         e6b.show_problem();
     }
 };
+
+
+/**
+ * Calculate density altitude from pressure altitude and temperature.
+ */
+e6b.density_altitude = function (pressure_altitude, temperature) {
+    // FIXME - rough approximations - results are a bit too high
+    var isa_temperature = 15 - (pressure_altitude / 1000 * 1.98); // difference from ISO temperature
+    var offset = (temperature - isa_temperature) * 118.8;
+    return Math.round(pressure_altitude + offset);
+};
+
 
 
 
