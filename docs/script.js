@@ -271,7 +271,7 @@ e6b.gen_density_alt = function () {
     params.oat = 15 - (params.palt * 1.98 / 1000) + oat_offset;
     params.dalt = e6b.density_altitude(params.palt, params.oat);
     params.cas = e6b.rand(70, 250);
-    params.tas = Math.round(params.cas + (params.cas * (0.02 * (params.dalt / 1000))));
+    params.tas = Math.round(e6b.true_airspeed(params.cas, params.dalt));
     params.oat = Math.round(params.oat);
     return params;
 };
@@ -625,14 +625,23 @@ e6b.input = function () {
 
 /**
  * Calculate density altitude from pressure altitude and temperature.
+ * Reverse engineered from the E6B
  */
 e6b.density_altitude = function (pressure_altitude, temperature) {
-    // FIXME - rough approximations - results are a bit too high
     var isa_temperature = 15 - (pressure_altitude / 1000 * 1.98); // difference from ISO temperature
     var offset = (temperature - isa_temperature) * 118.8;
     return Math.round(pressure_altitude + offset);
 };
 
+
+/**
+ * Calculate true airspeed from calibrated airspeed and density altitude.
+ * Reverse engineered from the E6B
+ */
+e6b.true_airspeed = function (calibrated_airspeed, density_altitude) {
+    var factor = 1 + ((density_altitude / 1000) * (0.012 + (density_altitude / 1000) * 0.0004)); // WRONG, but close
+    return calibrated_airspeed * factor;
+};
 
 
 
