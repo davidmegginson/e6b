@@ -26,12 +26,12 @@ var e6b = {
  */
 e6b.gen_wind_params = function () {
     var params = {};
-    params.track = e6b.rand(0, 360);
+    params.course = e6b.rand(0, 360);
     params.tas = e6b.rand(60, 250);
     params.wind_dir = e6b.rand(0, 36) * 10;
     params.wind_speed = e6b.rand(5, 40);
 
-    var delta = params.wind_dir - params.track;
+    var delta = params.wind_dir - params.course;
     var cos = Math.cos(delta * (Math.PI / 180.0));
     var sin = Math.sin(delta * (Math.PI / 180.0));
     params.headwind = Math.round(params.wind_speed * cos);
@@ -41,8 +41,8 @@ e6b.gen_wind_params = function () {
     var effective_speed = Math.round(params.tas * cos2);
     params.gs = effective_speed - params.headwind;
 
-    var delta2 = Math.round(Math.acos(cos2) * (180 / Math.PI)) * (Math.abs(params.wind_dir - params.track) < 180 ? 1 : -1);
-    params.heading = params.track + delta2;
+    var delta2 = Math.round(Math.acos(cos2) * (180 / Math.PI)) * (Math.abs(params.wind_dir - params.course) < 180 ? 1 : -1);
+    params.heading = params.course + delta2;
 
     return params;
 };
@@ -54,18 +54,16 @@ e6b.gen_wind_params = function () {
 e6b.problems.wind.wind = function () {
     var params = e6b.gen_wind_params();
     return [
-        "Calculate actual winds: track "
-	    + params.track
+        "Calculate actual winds: course "
+	    + params.course
 	    + "°, heading "
 	    + params.heading
 	    + "°, " + params.tas
 	    + " kt TAS, "
 	    + e6b.num(params.gs, 'kt GS.'),
-        "Winds are from "
-	    + params.wind_dir
+	params.wind_dir
 	    + "° @ "
-	    + params.wind_speed
-	    + " kt."
+	    + e6b.num(params.wind_speed, 'knots')
     ];
 };
 
@@ -76,17 +74,17 @@ e6b.problems.wind.wind = function () {
 e6b.problems.wind.heading = function () {
     var params = e6b.gen_wind_params();
     return [
-        "Calculate heading: desired course "
-	    + params.track
-	    + "°, airspeed "
-	    + e6b.num(params.tas, 'kt TAS')
-	    + ", winds "
+        "Calculate heading: course "
+	    + params.course
+	    + "°, "
+	    + e6b.num(params.tas, 'knots true airspeed')
+	    + ", wind from "
 	    + params.wind_dir
-	    + "@"
-	    + e6b.num(params.wind_speed, 'kt.'),
-        "Required heading is "
-	    + params.heading
-	    + "°."
+	    + "° @ "
+	    + e6b.num(params.wind_speed, 'knots.'),
+        "Fly heading "
+            +e6b.num(params.heading)
+	    + "°"
     ];
 };
 
@@ -97,16 +95,15 @@ e6b.problems.wind.heading = function () {
 e6b.problems.wind.groundspeed = function () {
     var params = e6b.gen_wind_params();
     return [
-        "Calculate groundspeed: desired course "
-	    + params.track
+        "Calculate groundspeed: course "
+	    + params.course
 	    + "°, airspeed "
 	    + params.tas
 	    + " kt TAS, winds "
 	    + params.wind_dir
 	    + "@"
 	    + e6b.num(params.wind_speed, 'kt'),
-        "Groundspeed is "
-	    + e6b.num(params.gs, 'kt')
+        e6b.num(params.gs, 'knots groundspeed')
     ];
 };
 
@@ -116,9 +113,19 @@ e6b.problems.wind.groundspeed = function () {
  */
 e6b.problems.wind.headwind = function () {
     var params = e6b.gen_wind_params();
+    var dir = (params.headwind < 0 ? ' tailwind' : ' headwind');
     return [
-        "Calculate headwind/tailwind: desired course " + params.track + "°, airspeed " + params.tas + " kt TAS, winds " + params.wind_dir + "@" + params.wind_speed + " kt.",
-        "There is a " + Math.abs(params.headwind) + (params.headwind < 0 ? " kt tailwind component." : " kt headwind component.")
+        "Calculate headwind/tailwind: course "
+            + params.course +
+            "°, "
+            + e6b.num(params.tas, "knots true airspeed")
+            + ", wind from "
+            + params.wind_dir
+            + "° @ "
+            + e6b.num(params.wind_speed, 'knots')
+            + ".",
+        e6b.num(Math.abs(params.headwind), 'knot')
+            + dir
     ];
 };
 
@@ -128,9 +135,18 @@ e6b.problems.wind.headwind = function () {
  */
 e6b.problems.wind.crosswind = function () {
     var params = e6b.gen_wind_params();
+    var dir = params.crosswind < 0 ? ' from the left' : ' from the right';
     return [
-        "Calculate crosswind: track " + params.track + "°, airspeed " + params.tas + " kt TAS, winds " + params.wind_dir + "@" + params.wind_speed + " kt.",
-        "The crosswind is " + Math.abs(params.crosswind) + " kt from the " + (params.crosswind < 0 ? "left." : "right.")
+        "Calculate crosswind: course "
+            + params.course + "°, "
+            + e6b.num(params.tas, "knots true airspeed")
+            + ", wind from "
+            + params.wind_dir
+            + "° @ "
+            + e6b.num(params.wind_speed, 'knots')
+            + ".",
+        e6b.num(Math.abs(params.crosswind), 'knots')
+            + dir
     ];
 };
 
@@ -150,7 +166,6 @@ e6b.gen_dst_params = function () {
     params.speed = e6b.rand(60, 300);
     params.time = e6b.rand(5, 180);
     params.dist = Math.round(params.speed / 60.0 * params.time);
-    params.time = e6b.time(params.time);
     return params;
 };
 
@@ -164,7 +179,7 @@ e6b.problems.calc.speed = function () {
         "Calculate groundspeed after flying "
             + e6b.num(params.dist, "nautical miles")
             + " in "
-            + params.time
+            + e6b.time(params.time)
             + "?",
         e6b.num(params.speed, "knots groundspeed")
     ];
@@ -182,7 +197,7 @@ e6b.problems.calc.time = function () {
             + " at "
             + e6b.num(params.speed, "knots")
             + ".",
-        params.time
+        e6b.hours(params.time)
     ];
 };
 
@@ -194,7 +209,7 @@ e6b.problems.calc.dist = function () {
     var params = e6b.gen_dst_params();
     return [
         "Calculate distance traveled in "
-            + params.time
+            + e6b.hours(params.time)
             + " at "
             + e6b.num(params.speed, "knots")
             + ".",
@@ -211,7 +226,6 @@ e6b.gen_bef_params = function () {
     params.burn = e6b.rand(50, 300) / 10.0; // one decimal place
     params.endurance = e6b.rand(5, 180);
     params.fuel = Math.round(params.burn / 6.0 * params.endurance) / 10.0;
-    params.endurance = e6b.time(params.endurance);
     return params;
 };
 
@@ -222,8 +236,12 @@ e6b.gen_bef_params = function () {
 e6b.problems.calc.burn = function () {
     params = e6b.gen_bef_params();
     return [
-        "What is your fuel burn if you use " + params.fuel + " gallons in " + params.endurance + "?",
-        "" + params.burn + " gallons per hour"
+        "Calculate fuel consumption gallons/hour after using "
+            + e6b.num(params.fuel, 'gallons')
+            + " in "
+            + e6b.time(params.endurance)
+            + ".",
+        e6b.num(params.burn, "gallons per hour")
     ];
 };
 
@@ -235,8 +253,8 @@ e6b.problems.calc.fuel = function () {
     params = e6b.gen_bef_params();
     return [
         "Calculate fuel used in "
-            + params.endurance
-            + " at "
+            + e6b.time(params.endurance)
+            + " consuming "
             + e6b.num(params.burn, 'gallons/hour')
             + ".",
         e6b.num(params.fuel, 'gallons')
@@ -252,10 +270,10 @@ e6b.problems.calc.burn = function () {
     return [
         "Calculate your endurance with "
             + e6b.num(params.fuel, 'gallons')
-            + " burning "
+            + " consuming "
             + e6b.num(params.burn, "gallons per hour")
             + ".",
-        params.endurance
+        e6b.time(params.endurance)
     ];
 };
 
@@ -567,7 +585,10 @@ e6b.rand_item = function (obj) {
 /**
  * Format a number in the current locale string, and optionally add units.
  */
-e6b.num = function (n, unit) {
+e6b.num = function (n, unit, precision) {
+    if (precision) {
+        n = Math.round(n / precision) * precision;
+    }
     var s = n.toLocaleString();
     if (unit) {
 	s += "\xa0" + unit;
