@@ -22,27 +22,65 @@ var e6b = {
 
 
 /**
+ * Basic trig to calculate a headwind
+ */
+e6b.get_headwind = function (course, wind_dir, wind_speed) {
+    // use the cosine of the angle between the course and the wind
+    var cos = Math.cos((wind_dir - course) * (Math.PI / 180.0));
+    return Math.round(wind_speed * cos);
+};
+
+
+/**
+ * Basic trig to calculate a crosswind.
+ */
+e6b.get_crosswind = function (course, wind_dir, wind_speed) {
+    // use the sine of the angle between the course and the wind
+    var sin = Math.sin((wind_dir - course) * (Math.PI / 180.0));
+    return Math.round(wind_speed * sin);
+};
+
+
+/**
+ * Calculate effective speed when in a crab.
+ * FIXME: needs testing
+ */
+e6b.get_effective_speed = function (true_airspeed, crosswind) {
+    // Use Pythagoras to compute the cosine
+    var cos = true_airspeed / Math.sqrt(true_airspeed * true_airspeed + crosswind * crosswind);
+    return Math.round(true_airspeed * cos);
+};
+
+
+/**
+ * Calculate the wind-correction angle
+ * FIXME: needs testing
+ */
+e6b.get_wind_correction_angle = function (true_airspeed, crosswind) {
+    var cos = true_airspeed / Math.sqrt(true_airspeed * true_airspeed + crosswind * crosswind);
+    var dir = crosswind < 0 ? -1 : 1; // -1 for left, 1 for right
+    return Math.round(Math.acos(cos) *(180 / Math.PI)) * dir;
+};
+
+
+/**
  * Generate random parameters for a wind problem.
  */
 e6b.gen_wind_params = function () {
     var params = {};
+
+    // Randomly-generated values
     params.course = e6b.rand(0, 360);
-    params.tas = e6b.rand(60, 250);
+    params.true_airspeed = e6b.rand(60, 250);
     params.wind_dir = e6b.rand(0, 36) * 10;
     params.wind_speed = e6b.rand(5, 40);
 
-    var delta = params.wind_dir - params.course;
-    var cos = Math.cos(delta * (Math.PI / 180.0));
-    var sin = Math.sin(delta * (Math.PI / 180.0));
-    params.headwind = Math.round(params.wind_speed * cos);
-    params.crosswind = Math.round(params.wind_speed * sin);
-
-    var cos2 = params.tas / Math.sqrt(params.tas * params.tas + params.crosswind * params.crosswind);
-    var effective_speed = Math.round(params.tas * cos2);
-    params.gs = effective_speed - params.headwind;
-
-    var delta2 = Math.round(Math.acos(cos2) * (180 / Math.PI)) * (Math.abs(params.wind_dir - params.course) < 180 ? 1 : -1);
-    params.heading = params.course + delta2;
+    // Derived values
+    params.headwind = e6b.get_headwind(params.course, params.wind_dir, params.wind_speed);
+    params.crosswind = e6b.get_crosswind(params.course, params.wind_dir, params.wind_speed);
+    params.groundspeed = e6b.get_effective_speed(params.true_airspeed, params.crosswind) - params.headwind;
+    params.wind_correction_angle = e6b.get_wind_correction_angle(params.true_airspeed, params.crosswind);
+    params.heading = (params.course + params.wind_correction_angle) % 360;
 
     return params;
 };
@@ -58,9 +96,9 @@ e6b.problems.wind.wind = function () {
 	    + params.course
 	    + "°, heading "
 	    + params.heading
-	    + "°, " + params.tas
+	    + "°, " + params.true_airspeed
 	    + " kt TAS, "
-	    + e6b.num(params.gs, 'kt GS.'),
+	    + e6b.num(params.groundspeed, 'kt GS.'),
 	params.wind_dir
 	    + "° @ "
 	    + e6b.num(params.wind_speed, 'knots')
@@ -69,7 +107,7 @@ e6b.problems.wind.wind = function () {
 
 
 /**
- * Wind problem: calculate (crabbed) heading.
+ * Wind problem: calculate heading corrected for wind.
  */
 e6b.problems.wind.heading = function () {
     var params = e6b.gen_wind_params();
@@ -77,7 +115,7 @@ e6b.problems.wind.heading = function () {
         "Calculate heading: course "
 	    + params.course
 	    + "°, "
-	    + e6b.num(params.tas, 'knots true airspeed')
+	    + e6b.num(params.true_airspeed, 'knots true airspeed')
 	    + ", wind from "
 	    + params.wind_dir
 	    + "° @ "
@@ -98,12 +136,12 @@ e6b.problems.wind.groundspeed = function () {
         "Calculate groundspeed: course "
 	    + params.course
 	    + "°, airspeed "
-	    + params.tas
+	    + params.true_airspeed
 	    + " kt TAS, winds "
 	    + params.wind_dir
 	    + "@"
 	    + e6b.num(params.wind_speed, 'kt'),
-        e6b.num(params.gs, 'knots groundspeed')
+        e6b.num(params.groundspeed, 'knots groundspeed')
     ];
 };
 
@@ -118,7 +156,7 @@ e6b.problems.wind.headwind = function () {
         "Calculate headwind/tailwind: course "
             + params.course +
             "°, "
-            + e6b.num(params.tas, "knots true airspeed")
+            + e6b.num(params.true_airspeed, "knots true airspeed")
             + ", wind from "
             + params.wind_dir
             + "° @ "
@@ -139,7 +177,7 @@ e6b.problems.wind.crosswind = function () {
     return [
         "Calculate crosswind: course "
             + params.course + "°, "
-            + e6b.num(params.tas, "knots true airspeed")
+            + e6b.num(params.true_airspeed, "knots true airspeed")
             + ", wind from "
             + params.wind_dir
             + "° @ "
@@ -147,6 +185,31 @@ e6b.problems.wind.crosswind = function () {
             + ".",
         e6b.num(Math.abs(params.crosswind), 'knots')
             + dir
+    ];
+};
+
+
+/**
+ * Wind problem: calculate wind-correction angle.
+ */
+e6b.problems.wind.wind_correction_angle = function () {
+    var params = e6b.gen_wind_params();
+    var dir = params.crosswind < 0 ? '° to the left' : '° to the right';
+    return [
+        "Calculate wind-correction angle: course "
+            + params.course
+            + "°, "
+            + e6b.num(params.true_airspeed, "knots true airspeed")
+            + ", wind from "
+            + params.wind_dir
+            + "° @ "
+            + e6b.num(params.wind_speed, 'knots')
+            + ".",
+        (params.wind_correction_angle == 0 ?
+         "No wind correction required" :
+         "Adjust heading "
+           + e6b.num(Math.abs(params.wind_correction_angle))
+           + dir)
     ];
 };
 
@@ -289,7 +352,7 @@ e6b.gen_density_alt = function () {
     params.oat = 15 - (params.palt * 1.98 / 1000) + oat_offset;
     params.dalt = e6b.density_altitude(params.palt, params.oat);
     params.cas = e6b.rand(70, 250);
-    params.tas = Math.round(e6b.true_airspeed(params.cas, params.dalt));
+    params.true_airspeed = Math.round(e6b.true_airspeed(params.cas, params.dalt));
     params.oat = Math.round(params.oat);
     return params;
 };
@@ -324,7 +387,7 @@ e6b.problems.calc.true_airspeed = function () {
             + " pressure altitude, "
             + e6b.num(params.oat)
             + "°C outside air temperature.",
-        e6b.num(params.tas, 'knots true airspeed')
+        e6b.num(params.true_airspeed, 'knots true airspeed')
     ];
 };
 
