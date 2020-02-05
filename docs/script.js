@@ -242,7 +242,7 @@ e6b.problems.calc.speed = function () {
         "Calculate groundspeed after flying "
             + e6b.num(params.dist, "nautical miles")
             + " in "
-            + e6b.time(params.time)
+            + e6b.hours(params.time)
             + "?",
         e6b.num(params.speed, "knots groundspeed")
     ];
@@ -302,7 +302,7 @@ e6b.problems.calc.burn = function () {
         "Calculate fuel consumption gallons/hour after using "
             + e6b.num(params.fuel, 'gallons')
             + " in "
-            + e6b.time(params.endurance)
+            + e6b.hours(params.endurance)
             + ".",
         e6b.num(params.burn, "gallons per hour")
     ];
@@ -316,7 +316,7 @@ e6b.problems.calc.fuel = function () {
     params = e6b.gen_bef_params();
     return [
         "Calculate fuel used in "
-            + e6b.time(params.endurance)
+            + e6b.hours(params.endurance)
             + " consuming "
             + e6b.num(params.burn, 'gallons/hour')
             + ".",
@@ -336,7 +336,7 @@ e6b.problems.calc.burn = function () {
             + " consuming "
             + e6b.num(params.burn, "gallons per hour")
             + ".",
-        e6b.time(params.endurance)
+        e6b.hours(params.endurance)
     ];
 };
 
@@ -622,6 +622,40 @@ e6b.problems.calc.temperature = function () {
 };
 
 
+/**
+ * Calculator problem: multiplication.
+ */
+e6b.problems.calc.multiplication = function () {
+    var n1 = e6b.rand(3, 99);
+    var n2 = e6b.rand(3, 99);
+    return [
+        "Multiply "
+            + e6b.num(n1)
+            + '  by '
+            + e6b.num(n2)
+            + '.',
+        e6b.num(n1 * n2)
+    ];
+};
+
+
+/**
+ * Calculator problem: division.
+ */
+e6b.problems.calc.division = function () {
+    var n1 = e6b.rand(3, 99);
+    var n2 = e6b.rand(3, 99);
+    return [
+        "Divide "
+            + e6b.num(n1 * n2)
+            + '  by '
+            + e6b.num(n1)
+            + '.',
+        e6b.num(n2)
+    ];
+};
+
+
 
 ////////////////////////////////////////////////////////////////////////
 // Utility functions.
@@ -663,7 +697,7 @@ e6b.num = function (n, unit, precision) {
 /**
  * Display minutes as HH:MM
  */
-e6b.time = function(minutes) {
+e6b.hours = function(minutes) {
     var h = Math.floor(minutes / 60);
     var m = minutes % 60;
     if (m < 10) {
