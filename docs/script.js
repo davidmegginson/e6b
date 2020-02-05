@@ -92,16 +92,19 @@ e6b.gen_wind_params = function () {
 e6b.problems.wind.wind = function () {
     var params = e6b.gen_wind_params();
     return [
-        "Calculate actual winds: course "
+        "Calculate actual wind: "
+            + e6b.num(params.true_airspeed, 'knot')
+	    + " true airspeed,  course "
 	    + params.course
 	    + "°, heading "
 	    + params.heading
-	    + "°, " + params.true_airspeed
-	    + " kt TAS, "
-	    + e6b.num(params.groundspeed, 'kt GS.'),
-	params.wind_dir
-	    + "° @ "
-	    + e6b.num(params.wind_speed, 'knots')
+	    + "°, "
+	    + e6b.num(params.groundspeed, 'knot')
+            + ' groundspeed.',
+	"Wind from "
+            + e6b.num(params.wind_dir)
+	    + "°\xa0@\xa0"
+	    + e6b.num(params.wind_speed, 'knot')
     ];
 };
 
@@ -112,14 +115,15 @@ e6b.problems.wind.wind = function () {
 e6b.problems.wind.heading = function () {
     var params = e6b.gen_wind_params();
     return [
-        "Calculate heading: course "
+        "Calculate heading: "
+	    + e6b.num(params.true_airspeed, 'knot')
+	    + " true airspeed, course "
 	    + params.course
-	    + "°, "
-	    + e6b.num(params.true_airspeed, 'knots true airspeed')
-	    + ", wind from "
+	    + "°, wind from "
 	    + params.wind_dir
-	    + "° @ "
-	    + e6b.num(params.wind_speed, 'knots.'),
+	    + "°\xa0@\xa0"
+	    + e6b.num(params.wind_speed, 'knot')
+            + ".",
         "Fly heading "
             +e6b.num(params.heading)
 	    + "°"
@@ -133,15 +137,17 @@ e6b.problems.wind.heading = function () {
 e6b.problems.wind.groundspeed = function () {
     var params = e6b.gen_wind_params();
     return [
-        "Calculate groundspeed: course "
-	    + params.course
-	    + "°, airspeed "
-	    + params.true_airspeed
-	    + " kt TAS, winds "
-	    + params.wind_dir
-	    + "@"
-	    + e6b.num(params.wind_speed, 'kt'),
-        e6b.num(params.groundspeed, 'knots groundspeed')
+        "Calculate groundspeed: "
+	    + e6b.num(params.true_airspeed, 'knot')
+	    + " true airspeed, course "
+	    + e6b.num(params.course)
+	    + "°, wind from "
+	    + e6b.num(params.wind_dir)
+	    + "°\xa0@\xa0"
+	    + e6b.num(params.wind_speed, 'knot')
+            + ".",
+        e6b.num(params.groundspeed, 'knot')
+            + ' groundspeed'
     ];
 };
 
@@ -153,37 +159,16 @@ e6b.problems.wind.headwind = function () {
     var params = e6b.gen_wind_params();
     var dir = (params.headwind < 0 ? ' tailwind' : ' headwind');
     return [
-        "Calculate headwind/tailwind: course "
+        "Calculate headwind or tailwind: "
+            + e6b.num(params.true_airspeed, "knot")
+            + " true airspeed, course "
             + params.course +
-            "°, "
-            + e6b.num(params.true_airspeed, "knots true airspeed")
-            + ", wind from "
+            "°, wind from "
             + params.wind_dir
-            + "° @ "
-            + e6b.num(params.wind_speed, 'knots')
+            + "°\xa0@\xa0"
+            + e6b.num(params.wind_speed, 'knot')
             + ".",
-        e6b.num(Math.abs(params.headwind), 'knot')
-            + dir
-    ];
-};
-
-
-/**
- * Wind problem: calculate crosswind.
- */
-e6b.problems.wind.crosswind = function () {
-    var params = e6b.gen_wind_params();
-    var dir = params.crosswind < 0 ? ' from the left' : ' from the right';
-    return [
-        "Calculate crosswind: course "
-            + params.course + "°, "
-            + e6b.num(params.true_airspeed, "knots true airspeed")
-            + ", wind from "
-            + params.wind_dir
-            + "° @ "
-            + e6b.num(params.wind_speed, 'knots')
-            + ".",
-        e6b.num(Math.abs(params.crosswind), 'knots')
+        e6b.num(Math.abs(params.headwind), 'knot', 'knot') // use "knot" for singular and plural before headwind/tailwind
             + dir
     ];
 };
@@ -196,14 +181,14 @@ e6b.problems.wind.wind_correction_angle = function () {
     var params = e6b.gen_wind_params();
     var dir = params.crosswind < 0 ? '° to the left' : '° to the right';
     return [
-        "Calculate wind-correction angle: course "
+        "Calculate wind-correction angle: "
+            + e6b.num(params.true_airspeed, "knot")
+            + " true airspeed, course "
             + params.course
-            + "°, "
-            + e6b.num(params.true_airspeed, "knots true airspeed")
-            + ", wind from "
+            + "°, wind from "
             + params.wind_dir
-            + "° @ "
-            + e6b.num(params.wind_speed, 'knots')
+            + "°\xa0@\xa0"
+            + e6b.num(params.wind_speed, 'knot')
             + ".",
         (params.wind_correction_angle == 0 ?
          "No wind correction required" :
@@ -213,6 +198,30 @@ e6b.problems.wind.wind_correction_angle = function () {
     ];
 };
 
+
+/**
+ * Calculate the runway crosswind for landing.
+ */
+e6b.problems.wind.runway_crosswind = function () {
+    var runway = e6b.rand(0, 36) + 1;
+    var wind_dir = ((runway * 10) + e6b.rand(-90, 90)) % 360;
+    var wind_speed = e6b.rand(15, 25);
+    var crosswind = e6b.get_crosswind(runway * 10, wind_dir, wind_speed);
+    var dir = crosswind < 0 ? " from the left" : " from the right";
+    return [
+        "Calculate crosswind: landing on runway "
+            + runway
+            + " with surface wind from "
+            + wind_dir
+            + "°\xa0@\xa0"
+            + e6b.num(wind_speed, 'knot')
+            + ".",
+        crosswind == 0 ? "No crosswind"
+            : "Crosswind "
+            + e6b.num(Math.abs(crosswind), 'knot')
+            + dir
+    ]
+};
 
 
 
@@ -240,11 +249,12 @@ e6b.problems.calc.speed = function () {
     var params = e6b.gen_dst_params();
     return [
         "Calculate groundspeed after flying "
-            + e6b.num(params.dist, "nautical miles")
+            + e6b.num(params.dist, "nautical\xa0mile")
             + " in "
             + e6b.hours(params.time)
-            + "?",
-        e6b.num(params.speed, "knots groundspeed")
+            + ".",
+        e6b.num(params.speed, "knot")
+            + " groundspeed"
     ];
 };
 
@@ -256,9 +266,9 @@ e6b.problems.calc.time = function () {
     var params = e6b.gen_dst_params();
     return [
         "Calculate time to fly "
-            + e6b.num(params.dist, "nautical miles")
+            + e6b.num(params.dist, "nautical\xa0mile")
             + " at "
-            + e6b.num(params.speed, "knots")
+            + e6b.num(params.speed, "knot")
             + ".",
         e6b.hours(params.time)
     ];
@@ -274,9 +284,9 @@ e6b.problems.calc.dist = function () {
         "Calculate distance traveled in "
             + e6b.hours(params.time)
             + " at "
-            + e6b.num(params.speed, "knots")
+            + e6b.num(params.speed, "knot")
             + ".",
-        e6b.num(params.dist, "nautical miles")
+        e6b.num(params.dist, "nautical\xa0mile")
     ];
 };
 
@@ -300,11 +310,12 @@ e6b.problems.calc.burn = function () {
     params = e6b.gen_bef_params();
     return [
         "Calculate fuel consumption gallons/hour after using "
-            + e6b.num(params.fuel, 'gallons')
+            + e6b.num(params.fuel, 'gallon')
             + " in "
             + e6b.hours(params.endurance)
             + ".",
-        e6b.num(params.burn, "gallons per hour")
+        e6b.num(params.burn, "gallon")
+            + " / hour"
     ];
 };
 
@@ -317,10 +328,10 @@ e6b.problems.calc.fuel = function () {
     return [
         "Calculate fuel used in "
             + e6b.hours(params.endurance)
-            + " consuming "
-            + e6b.num(params.burn, 'gallons/hour')
-            + ".",
-        e6b.num(params.fuel, 'gallons')
+            + ", consuming "
+            + e6b.num(params.burn, 'gallon')
+            + " / hour.",
+        e6b.num(params.fuel, 'gallon')
     ];
 };
 
@@ -332,10 +343,10 @@ e6b.problems.calc.burn = function () {
     var params = e6b.gen_bef_params();
     return [
         "Calculate your endurance with "
-            + e6b.num(params.fuel, 'gallons')
-            + " consuming "
-            + e6b.num(params.burn, "gallons per hour")
-            + ".",
+            + e6b.num(params.fuel, 'gallon')
+            + ", consuming "
+            + e6b.num(params.burn, "gallon")
+            + " / hour.",
         e6b.hours(params.endurance)
     ];
 };
@@ -365,11 +376,12 @@ e6b.problems.calc.density_alt = function () {
     var params = e6b.gen_density_alt();
     return [
         "Calculate density altitude for "
-	    + e6b.num(params.palt, 'feet pressure altitude')
-	    + " and "
+	    + e6b.num(params.palt, 'foot', 'feet')
+	    + " pressure altitude and "
 	    + e6b.num(params.oat)
 	    + "°C outside air temperature.",
-        e6b.num(Math.round(params.dalt/100)*100, "feet density altitude")
+        e6b.num(Math.round(params.dalt/100)*100, 'foot', 'feet')
+            + " density altitude"
     ];
 };
 
@@ -381,13 +393,14 @@ e6b.problems.calc.true_airspeed = function () {
     var params = e6b.gen_density_alt();
     return [
         "Calculate true airspeed for "
-            + e6b.num(params.cas, 'knots')
+            + e6b.num(params.cas, 'knot')
             + " calibrated airspeed, "
-            + e6b.num(params.palt, 'feet')
+            + e6b.num(params.palt, 'foot', 'feet')
             + " pressure altitude, "
             + e6b.num(params.oat)
             + "°C outside air temperature.",
-        e6b.num(params.true_airspeed, 'knots true airspeed')
+        e6b.num(params.true_airspeed, 'knot')
+            + ' true airspeed'
     ];
 };
 
@@ -410,13 +423,14 @@ e6b.problems.calc.true_altitude = function () {
     var true_alt = Math.round(pressure_alt + ((pressure_alt - station_elev) / 1000 * delta_temp * 4));
     return [
 	"Calculate true altitude for station elevation "
-            + e6b.num(station_elev, 'feet MSL')
-            + ", "
-            + e6b.num(pressure_alt, 'feet pressure altitude')
-            + ", "
+            + e6b.num(station_elev, 'foot', 'feet')
+            + " MSL, "
+            + e6b.num(pressure_alt, 'foot', 'feet')
+            + " pressure altitude, "
             + e6b.num(oat)
             + "°C outside air temperature.",
-	e6b.num(true_alt, 'feet true altitude')
+	e6b.num(true_alt, 'foot', 'feet')
+            + ' true altitude'
     ];
 };
 
@@ -439,9 +453,9 @@ e6b.problems.calc.litres = function () {
     var params = e6b.gen_vol_params();
     return [
         "Convert "
-            + e6b.num(params.gallons, 'gallons')
+            + e6b.num(params.gallons, 'gallon')
             + " to litres.",
-        e6b.num(params.litres, 'litres')
+        e6b.num(params.litres, 'litre')
     ];
 };
 
@@ -540,16 +554,16 @@ e6b.problems.calc.fuelweight = function () {
     case 0:
         return [
             "Calculate weight in pounds of "
-                + e6b.num(gallons, 'gallons')
+                + e6b.num(gallons, 'gallon')
                 + " of avgas at ISA sea level.",
-            e6b.num(lb, 'pounds')
+            e6b.num(lb, 'pound')
         ];
     default:
         return [
             "Calculate volume in gallons of "
-                + e6b.num(lb, 'pounds')
+                + e6b.num(lb, 'pound')
                 + " of avgas at ISA sea level.",
-            e6b.num(gallons, "gallons")
+            e6b.num(gallons, "gallon")
         ];
     }
 };
@@ -586,16 +600,16 @@ e6b.problems.calc.length = function () {
     case 0:
         return [
             "Convert "
-                + e6b.num(feet, 'feet')
+                + e6b.num(feet, 'foot', 'feet')
                 + " to metres.",
             e6b.num(metres, 'metres')
         ];
     default:
         return [
             "Convert "
-                + e6b.num(metres, 'metres')
+                + e6b.num(metres, 'metre')
                 + " to feet.",
-            e6b.num(feet, 'feet')
+            e6b.num(feet, 'foot', 'feet')
         ];
     }
 };
@@ -682,13 +696,13 @@ e6b.rand_item = function (obj) {
 /**
  * Format a number in the current locale string, and optionally add units.
  */
-e6b.num = function (n, unit, precision) {
-    if (precision) {
-        n = Math.round(n / precision) * precision;
-    }
+e6b.num = function (n, unit, unit_plural) {
     var s = n.toLocaleString();
     if (unit) {
-	s += "\xa0" + unit;
+        if (! unit_plural) {
+            unit_plural = unit + "s"
+        }
+	s += "\xa0" + (n == 1 ? unit : unit_plural);
     }
     return s;
 };
