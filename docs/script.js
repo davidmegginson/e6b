@@ -640,7 +640,7 @@ e6b.problems.calc.temperature = function () {
  * Calculator problem: multiplication.
  */
 e6b.problems.calc.multiplication = function () {
-    var n1 = e6b.rand(3, 99);
+    var n1 = e6b.rand(3, 9);
     var n2 = e6b.rand(3, 99);
     return [
         "Multiply "
@@ -657,7 +657,7 @@ e6b.problems.calc.multiplication = function () {
  * Calculator problem: division.
  */
 e6b.problems.calc.division = function () {
-    var n1 = e6b.rand(3, 99);
+    var n1 = e6b.rand(3, 9);
     var n2 = e6b.rand(3, 99);
     return [
         "Divide "
