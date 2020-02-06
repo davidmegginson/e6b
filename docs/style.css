@@ -1,5 +1,52 @@
 body {
     font-family: Helvetica, Arial, sanserif;
+    margin: 0 1em;
+}
+
+h1 {
+    font-size: 200%;
+    margin-left: 3.5ex;
+    vertical-align: middle;
+}
+
+img.logo {
+    float: left;
+    margin-left: -3.5ex;
+    margin-top: -0.5ex;
+    width: 3ex;
+}
+
+.menu {
+    display: block;
+    width: 100%;
+    list-style-type: none;
+    margin: 1ex 0;
+    padding: 0;
+}
+
+.menu:after {
+    clear: both;
+    display: block;
+    visibility: hidden;
+    height: 0;
+    content: ".";
+}
+
+.menu li {
+    float: left;
+    display: block;
+    width: 12em;
+    font-size: 120%;
+    text-align: center;
+    margin: 1ex 1ex 1ex 0;
+    padding: 1ex;
+    border-radius: 5px;
+    background: #444444;
+}
+
+.menu li a {
+    color: #ffffff;
+    text-decoration: none;
 }
 
 .instructions {
@@ -28,16 +75,3 @@ body {
     width: 1.5em;
 }
 
-#e6b-photo {
-    float: right;
-    max-width: 33vw;
-}
-
-#e6b-photo img {
-    max-width: 33vw;
-}
-
-#e6b-photo figcaption {
-    font-size: 80%;
-    font-style: italic;
-}
