@@ -45,7 +45,9 @@ img.logo {
 }
 
 .menu li a {
+    display: inline-block;
     color: #ffffff;
+    width: 100%;
     text-decoration: none;
 }
 
