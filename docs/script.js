@@ -89,7 +89,7 @@ e6b.gen_wind_params = function () {
 /**
  * Wind problem: calculate the actual winds.
  */
-e6b.problems.wind.wind = function () {
+e6b.problems.wind.actual_wind = function () {
     var params = e6b.gen_wind_params();
     return [
         "Calculate actual wind: "
@@ -159,9 +159,7 @@ e6b.problems.wind.headwind = function () {
     var params = e6b.gen_wind_params();
     var dir = (params.headwind < 0 ? ' tailwind' : ' headwind');
     return [
-        "Calculate headwind or tailwind: "
-            + e6b.num(params.true_airspeed, "knot")
-            + " true airspeed, course "
+        "Calculate headwind or tailwind: course "
             + params.course +
             "°, wind from "
             + params.wind_dir
