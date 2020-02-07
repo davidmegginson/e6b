@@ -432,120 +432,76 @@ e6b.problems.calc.true_altitude = function () {
     ];
 };
 
+
+/**
+ * Conversions (all one function, so they don't come up too often)
+ */
+e6b.problems.calc.units = function () {
+    var functions = [
+        e6b.units_convert_volume,
+        e6b.units_convert_long_distance,
+        e6b.units_convert_fuel_weight,
+        e6b.units_convert_weight,
+        e6b.units_convert_short_length,
+        e6b.units_convert_temperature,
+        e6b.units_multiplication,
+        e6b.units_division
+    ];
+    return functions[functions.length * Math.random() << 0]();
+};
+
  
 /**
- * Generate random parameters for a volume problem.
+ * Volume-conversion problems
  */
-e6b.gen_vol_params = function () {
-    var params = {};
-    params.gallons = e6b.rand(30, 1500) / 10.0; // one decimal place
-    params.litres = Math.round(params.gallons * 3.78541);
-    return params;
+e6b.units_convert_volume = function () {
+    var gallons = e6b.rand(30, 1500) / 10.0; // one decimal place
+    var litres = Math.round(gallons * 3.78541);
+    switch (e6b.rand(0, 2)) {
+    case 0:
+        return [
+            "Convert "
+                + e6b.num(gallons, 'gallon')
+                + " to litres.",
+            e6b.num(litres, 'litre')
+        ];
+    default:
+        return [
+            "Convert "
+                + e6b.num(litres, 'litre')
+                + " to gallons.",
+            e6b.num(gallons, "US\xa0gallon")
+        ];
+    }
 };
 
 
 /**
- * Calculator problem: convert gallons to litres.
+ * Long-distance conversion problems.
  */
-e6b.problems.calc.litres = function () {
-    var params = e6b.gen_vol_params();
+e6b.units_convert_long_distance = function () {
+    var distance_nm = e6b.rand(10, 300);
+    var values = [distance_nm, Math.round(distance_nm * 1.15078), Math.round(distance_nm * 1.852)];
+    var units = ["nautical\xa0mile", "statute\xa0mile", "kilometer"];
+    var i = e6b.rand(0, 3);
+    do {
+        var j = e6b.rand(0, 3);
+    } while (i == j);
     return [
         "Convert "
-            + e6b.num(params.gallons, 'gallon')
-            + " to litres.",
-        e6b.num(params.litres, 'litre')
+            + e6b.num(values[i], units[i])
+            + " to "
+            + e6b.plural(2, units[j])
+            + ".",
+        e6b.num(values[j], units[j])
     ];
-};
-
-
-/**
- * Calculator problem: convert litres to gallons.
- */
-e6b.problems.calc.gallons = function () {
-    var params = e6b.gen_vol_params();
-    return [
-        "Convert " + params.litres + " litres to gallons.",
-        "" + params.gallons + " US gallons"
-    ];
-};
-
-
-/**
- * Generate random parameters for a distance problem.
- */
-e6b.gen_dist_params = function () {
-    var params = {};
-    params.nm = e6b.rand(10, 300);
-    params.sm = Math.round(params.nm * 1.15078);
-    params.km = Math.round(params.nm * 1.852);
-    return params;
-};
-
-
-/**
- * Calculator problem: convert statue miles or kilometers to nautical miles
- */
-e6b.problems.calc.nm = function () {
-    var params = e6b.gen_dist_params();
-    switch (e6b.rand(0, 2)) {
-    case 0:
-        return [
-            "Convert " + params.sm + " statute miles to nautical miles.",
-            "" + params.nm + " nautical miles"
-        ];
-    default:
-        return [
-            "Convert " + params.km + " kilometers to nautical miles.",
-            "" + params.nm + " nautical miles"
-        ];
-    };
-};
-
-
-/**
- * Calculator problem: convert nautical miles or kilometers to statute miles
- */
-e6b.problems.calc.sm = function () {
-    var params = e6b.gen_dist_params();
-    switch (e6b.rand(0, 2)) {
-    case 0:
-        return [
-            "Convert " + params.nm + " nautical miles to statute miles.",
-            "" + params.sm + " statute miles"
-        ];
-    default:
-        return [
-            "Convert " + params.km + " kilometers to statute miles.",
-            "" + params.sm + " statute miles"
-        ];
-    };
-};
-
-
-/**
- * Calculator problem: convert nautical miles or kilometers to statute miles
- */
-e6b.problems.calc.km = function () {
-    var params = e6b.gen_dist_params();
-    switch (e6b.rand(0, 2)) {
-    case 0:
-        return [
-            "Convert " + params.nm + " nautical miles to kilometers.",
-            "" + params.km + " kilometers"
-        ];
-    default:
-        return [
-            "Convert " + params.sm + " statute miles to kilometers.",
-            "" + params.km + " kilometers"
-        ];
-    };
 };
 
 
 /**
  * Calculator problem: fuel weight
  */
-e6b.problems.calc.fuelweight = function () {
+e6b.units_convert_fuel_weight = function () {
     var gallons = e6b.rand(5, 150);
     var lb = Math.round(gallons * 6.01);
     switch (e6b.rand(0, 2)) {
@@ -570,7 +526,7 @@ e6b.problems.calc.fuelweight = function () {
 /**
  * Calculator problem: weight
  */
-e6b.problems.calc.weight = function () {
+e6b.units_convert_weight = function () {
     var lb = e6b.rand(10, 300);
     var kg = Math.round(lb / 2.205);
     switch (e6b.rand(0, 2)) {
@@ -591,7 +547,7 @@ e6b.problems.calc.weight = function () {
 /**
  * Calculator problem: length
  */
-e6b.problems.calc.length = function () {
+e6b.units_convert_short_length = function () {
     var feet = e6b.rand(1, 80) * 100;
     var metres = Math.round(feet / 3.281);
     switch (e6b.rand(0, 2)) {
@@ -600,7 +556,7 @@ e6b.problems.calc.length = function () {
             "Convert "
                 + e6b.num(feet, 'foot', 'feet')
                 + " to metres.",
-            e6b.num(metres, 'metres')
+            e6b.num(metres, 'metre')
         ];
     default:
         return [
@@ -616,7 +572,7 @@ e6b.problems.calc.length = function () {
 /**
  * Calculator problem: temperature
  */
-e6b.problems.calc.temperature = function () {
+e6b.units_convert_temperature = function () {
     var celsius = e6b.rand(-40, 40);
     var fahrenheit = Math.round(celsius * (9.0 / 5) + 32);
     switch (e6b.rand(0, 2)) {
@@ -637,7 +593,7 @@ e6b.problems.calc.temperature = function () {
 /**
  * Calculator problem: multiplication.
  */
-e6b.problems.calc.multiplication = function () {
+e6b.units_multiplication = function () {
     var n1 = e6b.rand(3, 9);
     var n2 = e6b.rand(3, 99);
     return [
@@ -654,7 +610,7 @@ e6b.problems.calc.multiplication = function () {
 /**
  * Calculator problem: division.
  */
-e6b.problems.calc.division = function () {
+e6b.units_division = function () {
     var n1 = e6b.rand(3, 9);
     var n2 = e6b.rand(3, 99);
     return [
@@ -692,17 +648,26 @@ e6b.rand_item = function (obj) {
 
 
 /**
+ * Pluralise units if necessary.
+ */
+e6b.plural = function (n, singular, plural) {
+    if (!plural) {
+        plural = singular + "s";
+    }
+    return (n == 1 ? singular : plural);
+};
+
+
+/**
  * Format a number in the current locale string, and optionally add units.
  */
 e6b.num = function (n, unit, unit_plural) {
     var s = n.toLocaleString();
     if (unit) {
-        if (! unit_plural) {
-            unit_plural = unit + "s"
-        }
-	s += "\xa0" + (n == 1 ? unit : unit_plural);
+        return s + "\xa0" + e6b.plural(n, unit, unit_plural);
+    } else {
+        return s;
     }
-    return s;
 };
 
 
