@@ -39,7 +39,6 @@ img.logo {
     font-size: 120%;
     text-align: center;
     margin: 1ex 1ex 1ex 0;
-    padding: 1ex;
     border-radius: 5px;
     background: #444444;
 }
@@ -48,6 +47,7 @@ img.logo {
     display: inline-block;
     color: #ffffff;
     width: 100%;
+    padding: 1ex;
     text-decoration: none;
 }
 
