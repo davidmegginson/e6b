@@ -551,14 +551,14 @@ e6b.problems.calc.fuelweight = function () {
     switch (e6b.rand(0, 2)) {
     case 0:
         return [
-            "Calculate weight in pounds of "
+            "Calculate weight in pounds for "
                 + e6b.num(gallons, 'gallon')
                 + " of avgas at ISA sea level.",
             e6b.num(lb, 'pound')
         ];
     default:
         return [
-            "Calculate volume in gallons of "
+            "Calculate volume in gallons for "
                 + e6b.num(lb, 'pound')
                 + " of avgas at ISA sea level.",
             e6b.num(gallons, "gallon")
