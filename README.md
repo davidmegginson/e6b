@@ -7,11 +7,11 @@ This client-side web app presents simple problems for either the calculator or w
 
 # Links
 
-Home: https://davidmegginson.github.io/e6b/
+Home: http://e6b.org
 
-Wind-side problems: https://davidmegginson.github.io/e6b/wind.html
+Wind-side problems: http://e6b.org/wind.html
 
-Calculator-side problems: https://davidmegginson.github.io/e6b/calc.html
+Calculator-side problems: http://e6b.org/calc.html
 
 # Donations
 
