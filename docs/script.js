@@ -434,6 +434,38 @@ e6b.problems.calc.true_altitude = function () {
 
 
 /**
+ * Calculator problem: rate of climb
+ */
+e6b.problems.calc.vertical_speed = function () {
+    var fpm = e6b.rand(300, 1200);
+    var gs = e6b.rand(50, 150);
+    var fpnm = Math.round(fpm * 60 / gs);
+    switch (e6b.rand(0, 2)) {
+    case 0:
+        return [
+            "Calculate feet / nautical mile: ground speed "
+                + e6b.num(gs, "knot")
+                + ", vertical speed "
+                + e6b.num(fpm, "foot", "feet")
+                + " / minute.",
+            e6b.num(fpnm, "foot", "feet")
+                + " / nautical mile"
+        ];
+    default:
+        return [
+            "Calculate feet / minute: ground speed "
+                + e6b.num(gs, "knot")
+                + ", gradiant "
+                + e6b.num(fpnm, "foot", "feet")
+                + " / nautical mile.",
+            e6b.num(fpm, "foot", "feet")
+                + " / minute"
+        ];
+    }
+};
+
+
+/**
  * Conversions (all one function, so they don't come up too often)
  */
 e6b.problems.calc.units = function () {
