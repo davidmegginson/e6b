@@ -35,9 +35,7 @@ img.logo {
 .menu li {
     float: left;
     display: block;
-    width: 12em;
-    font-size: 120%;
-    text-align: center;
+    padding: 0;
     margin: 1ex 1ex 1ex 0;
     border-radius: 5px;
     background: #444444;
@@ -46,7 +44,9 @@ img.logo {
 .menu li a {
     display: inline-block;
     color: #ffffff;
-    width: 100%;
+    font-size: 120%;
+    min-width: 12em;
+    text-align: center;
     padding: 1ex;
     text-decoration: none;
 }
