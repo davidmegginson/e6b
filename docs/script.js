@@ -781,7 +781,6 @@ window.addEventListener('load', function () {
 
     // Add listeners for user input
     window.addEventListener('click', e6b.input);
-    window.addEventListener('touchend', e6b.input);
     window.addEventListener('keypress', e6b.input);
 
     // Save points to the question / answer nodes
