@@ -44,7 +44,6 @@ img.logo {
 .menu li a {
     display: inline-block;
     color: #ffffff;
-    font-size: 120%;
     min-width: 12em;
     text-align: center;
     padding: 1ex;
