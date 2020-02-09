@@ -742,13 +742,11 @@ e6b.show_problem = function () {
  * React to an input event (click, tap, key)
  */
 e6b.input = function (event) {
-    event.preventDefault();
     if (e6b.nodes.answer.hidden) {
         e6b.nodes.answer.hidden = false;
     } else {
         e6b.show_problem();
     }
-    return false;
 };
 
 
@@ -782,7 +780,6 @@ window.addEventListener('load', function () {
 
     // Add listeners for user input
     document.addEventListener('click', e6b.input, { 'passive': false });
-    document.addEventListener('touchend', e6b.input, { 'passive': false });
     document.addEventListener('keypress', e6b.input, { 'passive': false });
 
     // Save points to the question / answer nodes
