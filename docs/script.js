@@ -742,12 +742,12 @@ e6b.show_problem = function () {
  * React to an input event (click, tap, key)
  */
 e6b.input = function (event) {
+    event.preventDefault();
     if (e6b.nodes.answer.hidden) {
         e6b.nodes.answer.hidden = false;
     } else {
         e6b.show_problem();
     }
-    event.preventDefault();
     return false;
 };
 
@@ -781,9 +781,9 @@ e6b.true_airspeed = function (calibrated_airspeed, density_altitude) {
 window.addEventListener('load', function () {
 
     // Add listeners for user input
-    window.addEventListener('touchstart', e6b.input);
-    window.addEventListener('click', e6b.input);
-    window.addEventListener('keypress', e6b.input);
+    document.addEventListener('click', e6b.input, { 'passive': false });
+    document.addEventListener('touchstart', e6b.input, { 'passive': false });
+    document.addEventListener('keypress', e6b.input, { 'passive': false });
 
     // Save points to the question / answer nodes
     e6b.nodes.question = document.getElementById("question");
