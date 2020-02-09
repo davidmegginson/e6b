@@ -782,7 +782,7 @@ window.addEventListener('load', function () {
 
     // Add listeners for user input
     document.addEventListener('click', e6b.input, { 'passive': false });
-    document.addEventListener('touchstart', e6b.input, { 'passive': false });
+    document.addEventListener('touchend', e6b.input, { 'passive': false });
     document.addEventListener('keypress', e6b.input, { 'passive': false });
 
     // Save points to the question / answer nodes
