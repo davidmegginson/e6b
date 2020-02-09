@@ -747,7 +747,7 @@ e6b.input = function (event) {
     } else {
         e6b.show_problem();
     }
-    event.stopPropagation();
+    event.preventDefault();
     return false;
 };
 
@@ -782,7 +782,7 @@ window.addEventListener('load', function () {
 
     // Add listeners for user input
     window.addEventListener('click', e6b.input);
-    // window.addEventListener('touchend', e6b.input);
+    window.addEventListener('touchend', e6b.input);
     window.addEventListener('keypress', e6b.input);
 
     // Save points to the question / answer nodes
