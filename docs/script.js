@@ -9,7 +9,8 @@
 var e6b = {
     problems: {
         calc: {},
-        wind: {}
+        wind: {},
+	disabled: {}
     },
     nodes: {}
 };
@@ -406,7 +407,7 @@ e6b.problems.calc.true_airspeed = function () {
 /**
  * Calculator problem: true altitude
  */
-e6b.problems.calc.true_altitude = function () {
+e6b.problems.disabled.true_altitude = function () {
     // nearest 100
     var station_elev = e6b.rand(0, 50) * 100;
     // nearest 1000
