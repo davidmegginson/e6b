@@ -20,7 +20,7 @@ img.logo {
     display: block;
     width: 100%;
     list-style-type: none;
-    margin: 1ex 0;
+    margin: .5ex 0;
     padding: 0;
 }
 
@@ -36,7 +36,7 @@ img.logo {
     float: left;
     display: block;
     padding: 0;
-    margin: 1ex 1ex 1ex 0;
+    margin: .5ex .5ex .5ex 0;
     border-radius: 5px;
     background: #444444;
 }
@@ -44,10 +44,18 @@ img.logo {
 .menu li a {
     display: inline-block;
     color: #ffffff;
-    min-width: 12em;
+    min-width: 8em;
     text-align: center;
-    padding: 1ex;
+    padding: .5ex;
     text-decoration: none;
+}
+
+.menu li#show-advanced {
+    background: green;
+}
+
+.menu li#hide-advanced {
+    background: red;
 }
 
 .instructions {
