@@ -8,8 +8,14 @@
  */
 var e6b = {
     problems: {
-        calc: {},
-        wind: {},
+        calc: {
+            basic: {},
+            advanced: {}
+        },
+        wind: {
+            basic: {},
+            advanced: {}
+        },
 	disabled: {}
     },
     nodes: {}
@@ -90,7 +96,7 @@ e6b.gen_wind_params = function () {
 /**
  * Wind problem: calculate the actual winds.
  */
-e6b.problems.wind.actual_wind = function () {
+e6b.problems.wind.advanced.actual_wind = function () {
     var params = e6b.gen_wind_params();
     return [
         "Calculate actual wind: "
@@ -113,7 +119,7 @@ e6b.problems.wind.actual_wind = function () {
 /**
  * Wind problem: calculate heading corrected for wind.
  */
-e6b.problems.wind.heading = function () {
+e6b.problems.wind.basic.heading = function () {
     var params = e6b.gen_wind_params();
     return [
         "Calculate heading: "
@@ -135,7 +141,7 @@ e6b.problems.wind.heading = function () {
 /**
  * Wind problem: calculate groundspeed.
  */
-e6b.problems.wind.groundspeed = function () {
+e6b.problems.wind.basic.groundspeed = function () {
     var params = e6b.gen_wind_params();
     return [
         "Calculate groundspeed: "
@@ -156,7 +162,7 @@ e6b.problems.wind.groundspeed = function () {
 /**
  * Wind problem: calculate headwind or tailwind.
  */
-e6b.problems.wind.headwind = function () {
+e6b.problems.wind.basic.headwind = function () {
     var params = e6b.gen_wind_params();
     var dir = (params.headwind < 0 ? ' tailwind' : ' headwind');
     return [
@@ -176,7 +182,7 @@ e6b.problems.wind.headwind = function () {
 /**
  * Wind problem: calculate wind-correction angle.
  */
-e6b.problems.wind.wind_correction_angle = function () {
+e6b.problems.wind.basic.wind_correction_angle = function () {
     var params = e6b.gen_wind_params();
     var dir = params.crosswind < 0 ? '° to the left' : '° to the right';
     return [
@@ -201,7 +207,7 @@ e6b.problems.wind.wind_correction_angle = function () {
 /**
  * Calculate the runway crosswind for landing.
  */
-e6b.problems.wind.runway_crosswind = function () {
+e6b.problems.wind.advanced.runway_crosswind = function () {
     var runway = e6b.rand(0, 36) + 1;
     var wind_dir = ((runway * 10) + e6b.rand(-90, 90)) % 360;
     var wind_speed = e6b.rand(15, 25);
@@ -244,7 +250,7 @@ e6b.gen_dst_params = function () {
 /**
  * Calculator problem: speed from distance and time
  */
-e6b.problems.calc.speed = function () {
+e6b.problems.calc.basic.speed = function () {
     var params = e6b.gen_dst_params();
     return [
         "Calculate groundspeed after flying "
@@ -261,7 +267,7 @@ e6b.problems.calc.speed = function () {
 /**
  * Calculator problem: time from speed and distance
  */
-e6b.problems.calc.time = function () {
+e6b.problems.calc.basic.time = function () {
     var params = e6b.gen_dst_params();
     return [
         "Calculate time to fly "
@@ -277,7 +283,7 @@ e6b.problems.calc.time = function () {
 /**
  * Calculator problem: distance from speed and time
  */
-e6b.problems.calc.dist = function () {
+e6b.problems.calc.basic.dist = function () {
     var params = e6b.gen_dst_params();
     return [
         "Calculate distance traveled in "
@@ -305,7 +311,7 @@ e6b.gen_bef_params = function () {
 /**
  * Calculator problem: fuel burn from fuel and endurance.
  */
-e6b.problems.calc.burn = function () {
+e6b.problems.calc.basic.burn = function () {
     params = e6b.gen_bef_params();
     return [
         "Calculate fuel consumption gallons/hour after using "
@@ -322,7 +328,7 @@ e6b.problems.calc.burn = function () {
 /**
  * Calculator problem: fuel from fuel burn and endurance.
  */
-e6b.problems.calc.fuel = function () {
+e6b.problems.calc.basic.fuel = function () {
     params = e6b.gen_bef_params();
     return [
         "Calculate fuel used in "
@@ -338,7 +344,7 @@ e6b.problems.calc.fuel = function () {
 /**
  * Calculator problem: endurance from fuel and fuel burn.
  */
-e6b.problems.calc.burn = function () {
+e6b.problems.calc.basic.burn = function () {
     var params = e6b.gen_bef_params();
     return [
         "Calculate your endurance with "
@@ -371,7 +377,7 @@ e6b.gen_density_alt = function () {
 /**
  * Calculator problem: density altitude from pressure altitude and OAT.
  */
-e6b.problems.calc.density_alt = function () {
+e6b.problems.calc.advanced.density_alt = function () {
     var params = e6b.gen_density_alt();
     return [
         "Calculate density altitude for "
@@ -388,7 +394,7 @@ e6b.problems.calc.density_alt = function () {
 /**
  * Calculator problem: TAS from CAS, pressure altitude, and OAT
  */
-e6b.problems.calc.true_airspeed = function () {
+e6b.problems.calc.advanced.true_airspeed = function () {
     var params = e6b.gen_density_alt();
     return [
         "Calculate true airspeed for "
@@ -407,27 +413,38 @@ e6b.problems.calc.true_airspeed = function () {
 /**
  * Calculator problem: true altitude
  */
-e6b.problems.disabled.true_altitude = function () {
-    // nearest 100
+e6b.problems.calc.advanced.true_altitude = function () {
+    // station elevation, 0-5000 ft (500 ft increments)
     var station_elev = e6b.rand(0, 50) * 100;
-    // nearest 1000
-    var pressure_alt = Math.round(station_elev / 1000) * 1000 + e6b.rand(0, 15) * 1000;
-    // ISA temperature
+
+    // indicated altitude, station alt + 3000-15000 ft (500-foot increments)
+    var indicated_alt = (Math.ceil(station_elev / 500) * 500) + (e6b.rand(6, 30) * 500);
+
+    // pressure altitude +/- 0-1000 ft from indicated
+    var pressure_alt = indicated_alt + (e6b.rand(-100, 100) * 10);
+
+    // expected ISA temperature at pressure altitude
     var isa_temp = Math.round(15 - (pressure_alt / 1000 * 1.98));
-    // randomised delta temperature
+
+    // randomised delta temperature, -20c to 20c
     var delta_temp = e6b.rand(-20, 20);
-    // actual temperature
+
+    // actual temperature at altitude
     var oat = isa_temp + delta_temp;
-    // true altitude
-    var true_alt = Math.round(pressure_alt + ((pressure_alt - station_elev) / 1000 * delta_temp * 4));
+    
+    // true altitude (rounded to the nearest 100 feet)
+    var true_alt = Math.round((indicated_alt + ((indicated_alt - station_elev) / 1000 * delta_temp * 4)) / 100) * 100;
+
     return [
 	"Calculate true altitude for station elevation "
             + e6b.num(station_elev, 'foot', 'feet')
-            + " MSL, "
+            + " MSL, indicated altitude "
+            + e6b.num(indicated_alt, 'foot', 'feet')
+            + ", pressure altitude "
             + e6b.num(pressure_alt, 'foot', 'feet')
-            + " pressure altitude, "
+            + ", outside air temperature "
             + e6b.num(oat)
-            + "°C outside air temperature.",
+            + "°C.",
 	e6b.num(true_alt, 'foot', 'feet')
             + ' true altitude'
     ];
@@ -437,7 +454,7 @@ e6b.problems.disabled.true_altitude = function () {
 /**
  * Calculator problem: rate of climb
  */
-e6b.problems.calc.vertical_speed = function () {
+e6b.problems.calc.advanced.vertical_speed = function () {
     var fpm = e6b.rand(300, 1200);
     var gs = e6b.rand(50, 150);
     var fpnm = Math.round(fpm * 60 / gs);
@@ -469,7 +486,7 @@ e6b.problems.calc.vertical_speed = function () {
 /**
  * Conversions (all one function, so they don't come up too often)
  */
-e6b.problems.calc.units = function () {
+e6b.problems.calc.advanced.units = function () {
     var functions = [
         e6b.units_convert_volume,
         e6b.units_convert_long_distance,
@@ -727,12 +744,21 @@ e6b.hours = function(minutes) {
  * Ask the next question.
  */
 e6b.show_problem = function () {
+    var problems = {};
     if (e6b.type == 'wind') {
-        var qfun = e6b.rand_item(e6b.problems.wind);
+        if (location.hash == '#advanced') {
+            problems = Object.assign({}, e6b.problems.wind.basic, e6b.problems.wind.advanced);
+        } else {
+            problems = e6b.problems.wind.basic;
+        }
     } else {
-        var qfun = e6b.rand_item(e6b.problems.calc);
+        if (location.hash == '#advanced') {
+            problems = Object.assign({}, e6b.problems.calc.basic, e6b.problems.calc.advanced);
+        } else {
+            problems = e6b.problems.calc.basic;
+        }
     }
-    var info = qfun();
+    var info = e6b.rand_item(problems)();
     e6b.nodes.answer.hidden = true;
     e6b.nodes.question.textContent = info[0];
     e6b.nodes.answer.textContent = info[1];
@@ -772,6 +798,22 @@ e6b.true_airspeed = function (calibrated_airspeed, density_altitude) {
 };
 
 
+e6b.setup_advanced = function () {
+    var show_node = document.getElementById('show-advanced');
+    var hide_node = document.getElementById('hide-advanced');
+
+    function toggle_visibility () {
+        var is_advanced = (location.hash == '#advanced');
+        show_node.style.display = (is_advanced ? 'none' : 'block');
+        hide_node.style.display = (is_advanced ? 'block' : 'none');
+    }
+
+    window.addEventListener('hashchange', toggle_visibility);
+    
+    toggle_visibility();
+};
+
+
 
 ////////////////////////////////////////////////////////////////////////
 // Hook to run the exercises
@@ -783,9 +825,12 @@ window.addEventListener('load', function () {
     document.addEventListener('click', e6b.input, { 'passive': false });
     document.addEventListener('keypress', e6b.input, { 'passive': false });
 
-    // Save points to the question / answer nodes
+    // Save pointers to specific nodes
     e6b.nodes.question = document.getElementById("question");
     e6b.nodes.answer = document.getElementById("answer");
+
+    // Setup basic/advanced toggle
+    e6b.setup_advanced();
 
     // Show the first problem
     e6b.show_problem();
