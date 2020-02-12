@@ -502,7 +502,7 @@ e6b.problems.calc.advanced.off_course = function () {
                 + e6b.num(dist_flown, "nautical\xa0mile")
                 + ".",
             e6b.num(correction_1)
-                + "°"
+                + "° correction"
         ];
     default:
         return [
@@ -514,7 +514,7 @@ e6b.problems.calc.advanced.off_course = function () {
                 + e6b.num(dist_remaining, "nautical\xa0mile")
                 + " remaining.",
             e6b.num(correction_1 + correction_2)
-                + "°"
+                + "° correction"
         ];
     }
 };
