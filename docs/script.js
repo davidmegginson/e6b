@@ -484,6 +484,43 @@ e6b.problems.calc.advanced.vertical_speed = function () {
 
 
 /**
+ * Calculator problem: off-course
+ */
+e6b.problems.calc.advanced.off_course = function () {
+    var dist_flown = e6b.rand(50, 200);
+    var dist_remaining = e6b.rand(50, 200);
+    var dist_off_course = e6b.rand(Math.round(dist_flown / 25), Math.round(dist_flown / 10));
+    var correction_1 = Math.round((dist_off_course / dist_flown) * 60);
+    var correction_2 = Math.round((dist_off_course / dist_remaining) * 60);
+
+    switch (e6b.rand(2)) {
+    case 0:
+        return [
+            "Degrees off course: "
+                + e6b.num(dist_off_course, "nautical\xa0mile")
+                + " off course after flying "
+                + e6b.num(dist_flown, "nautical\xa0mile")
+                + ".",
+            e6b.num(correction_1)
+                + "°"
+        ];
+    default:
+        return [
+            "Degrees correction to destination : "
+                + e6b.num(dist_off_course, "nautical\xa0mile")
+                + " off course after flying "
+                + e6b.num(dist_flown, "nautical\xa0mile")
+                + " with "
+                + e6b.num(dist_remaining, "nautical\xa0mile")
+                + " remaining.",
+            e6b.num(correction_1 + correction_2)
+                + "°"
+        ];
+    }
+};
+
+
+/**
  * Conversions (all one function, so they don't come up too often)
  */
 e6b.problems.calc.advanced.units = function () {
