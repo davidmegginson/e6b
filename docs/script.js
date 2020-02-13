@@ -87,32 +87,9 @@ e6b.gen_wind_params = function () {
     params.crosswind = e6b.get_crosswind(params.course, params.wind_dir, params.wind_speed);
     params.groundspeed = e6b.get_effective_speed(params.true_airspeed, params.crosswind) - params.headwind;
     params.wind_correction_angle = e6b.get_wind_correction_angle(params.true_airspeed, params.crosswind);
-    params.heading = (params.course + params.wind_correction_angle) % 360;
+    params.heading = (params.course + params.wind_correction_angle + 360) % 360;
 
     return params;
-};
-
-
-/**
- * Wind problem: calculate the actual winds.
- */
-e6b.problems.wind.advanced.actual_wind = function () {
-    var params = e6b.gen_wind_params();
-    return [
-        "Calculate actual wind: "
-            + e6b.num(params.true_airspeed, 'knot')
-	    + " true airspeed,  course "
-	    + params.course
-	    + "°, heading "
-	    + params.heading
-	    + "°, "
-	    + e6b.num(params.groundspeed, 'knot')
-            + ' groundspeed.',
-	"Wind from "
-            + e6b.num(params.wind_dir)
-	    + "°\xa0@\xa0"
-	    + e6b.num(params.wind_speed, 'knot')
-    ];
 };
 
 
@@ -122,15 +99,15 @@ e6b.problems.wind.advanced.actual_wind = function () {
 e6b.problems.wind.basic.heading = function () {
     var params = e6b.gen_wind_params();
     return [
-        "Calculate heading: "
-	    + e6b.num(params.true_airspeed, 'knot')
-	    + " true airspeed, course "
+        "Heading to fly: "
+	    + e6b.num(params.true_airspeed)
+	    + "\xa0kt TAS, course "
 	    + params.course
 	    + "°, wind from "
 	    + params.wind_dir
 	    + "°\xa0@\xa0"
-	    + e6b.num(params.wind_speed, 'knot')
-            + ".",
+	    + e6b.num(params.wind_speed)
+            + "\xa0kt.",
         "Fly heading "
             +e6b.num(params.heading)
 	    + "°"
@@ -144,17 +121,17 @@ e6b.problems.wind.basic.heading = function () {
 e6b.problems.wind.basic.groundspeed = function () {
     var params = e6b.gen_wind_params();
     return [
-        "Calculate groundspeed: "
-	    + e6b.num(params.true_airspeed, 'knot')
-	    + " true airspeed, course "
+        "Groundspeed: "
+	    + e6b.num(params.true_airspeed)
+	    + "\xa0kt TAS, course "
 	    + e6b.num(params.course)
 	    + "°, wind from "
 	    + e6b.num(params.wind_dir)
 	    + "°\xa0@\xa0"
-	    + e6b.num(params.wind_speed, 'knot')
-            + ".",
-        e6b.num(params.groundspeed, 'knot')
-            + ' groundspeed'
+	    + e6b.num(params.wind_speed)
+            + "\xa0kt.",
+        e6b.num(params.groundspeed)
+            + "\xa0kt groundspeed"
     ];
 };
 
@@ -164,42 +141,42 @@ e6b.problems.wind.basic.groundspeed = function () {
  */
 e6b.problems.wind.basic.headwind = function () {
     var params = e6b.gen_wind_params();
-    var dir = (params.headwind < 0 ? ' tailwind' : ' headwind');
     return [
-        "Calculate headwind or tailwind: course "
+        "Headwind/tailwind: course "
             + params.course +
             "°, wind from "
             + params.wind_dir
             + "°\xa0@\xa0"
-            + e6b.num(params.wind_speed, 'knot')
-            + ".",
-        e6b.num(Math.abs(params.headwind), 'knot', 'knot') // use "knot" for singular and plural before headwind/tailwind
-            + dir
+            + e6b.num(params.wind_speed)
+            + "\xa0kt.",
+        (params.headwind == 0 ?
+         "No headwind" :
+         e6b.num(Math.abs(params.headwind))
+         + "\xa0kt"
+         + (params.headwind < 0 ? ' tailwind' : ' headwind'))
     ];
 };
 
 
 /**
- * Wind problem: calculate wind-correction angle.
+ * Wind problem: calculate wind aloft.
  */
-e6b.problems.wind.basic.wind_correction_angle = function () {
+e6b.problems.wind.advanced.actual_wind = function () {
     var params = e6b.gen_wind_params();
-    var dir = params.crosswind < 0 ? '° to the left' : '° to the right';
     return [
-        "Calculate wind-correction angle: "
-            + e6b.num(params.true_airspeed, "knot")
-            + " true airspeed, course "
-            + params.course
-            + "°, wind from "
-            + params.wind_dir
-            + "°\xa0@\xa0"
-            + e6b.num(params.wind_speed, 'knot')
-            + ".",
-        (params.wind_correction_angle == 0 ?
-         "No wind correction required" :
-         "Adjust heading "
-           + e6b.num(Math.abs(params.wind_correction_angle))
-           + dir)
+        "Wind aloft: "
+            + e6b.num(params.true_airspeed)
+	    + "\xa0kt TAS,  course "
+	    + params.course
+	    + "°, heading "
+	    + params.heading
+	    + "°, "
+	    + e6b.num(params.groundspeed)
+            + '\xa0kt GS.',
+	"Wind from "
+            + e6b.num(params.wind_dir)
+	    + "°\xa0@\xa0"
+	    + e6b.num(params.wind_speed, 'kt', 'kt')
     ];
 };
 
@@ -209,22 +186,21 @@ e6b.problems.wind.basic.wind_correction_angle = function () {
  */
 e6b.problems.wind.advanced.runway_crosswind = function () {
     var runway = e6b.rand(0, 36) + 1;
-    var wind_dir = ((runway * 10) + e6b.rand(-90, 90)) % 360;
+    var wind_dir = ((runway * 10) + e6b.rand(-90, 90) + 360) % 360;
     var wind_speed = e6b.rand(15, 25);
     var crosswind = e6b.get_crosswind(runway * 10, wind_dir, wind_speed);
-    var dir = crosswind < 0 ? " from the left" : " from the right";
     return [
-        "Calculate crosswind: landing on runway "
-            + runway
-            + " with surface wind from "
-            + wind_dir
+        "Crosswind: runway "
+            + e6b.num(runway)
+            + ", wind from "
+            + e6b.num(wind_dir)
             + "°\xa0@\xa0"
-            + e6b.num(wind_speed, 'knot')
-            + ".",
+            + e6b.num(wind_speed)
+            + "\xa0kt.",
         crosswind == 0 ? "No crosswind"
-            : "Crosswind "
-            + e6b.num(Math.abs(crosswind), 'knot')
-            + dir
+            : e6b.num(Math.abs(crosswind))
+            + "\xa0kt crosswind "
+            + (crosswind < 0 ? "from the left" : "from the right")
     ]
 };
 
@@ -258,8 +234,8 @@ e6b.problems.calc.basic.speed = function () {
             + " in "
             + e6b.hours(params.time)
             + ".",
-        e6b.num(params.speed, "knot")
-            + " groundspeed"
+        e6b.num(params.speed)
+            + "\xa0kt groundspeed"
     ];
 };
 
@@ -273,8 +249,8 @@ e6b.problems.calc.basic.time = function () {
         "Calculate time to fly "
             + e6b.num(params.dist, "nautical\xa0mile")
             + " at "
-            + e6b.num(params.speed, "knot")
-            + ".",
+            + e6b.num(params.speed)
+            + "\xa0kt.",
         e6b.hours(params.time)
     ];
 };
@@ -289,8 +265,8 @@ e6b.problems.calc.basic.dist = function () {
         "Calculate distance traveled in "
             + e6b.hours(params.time)
             + " at "
-            + e6b.num(params.speed, "knot")
-            + ".",
+            + e6b.num(params.speed)
+            + "\xa0kt.",
         e6b.num(params.dist, "nautical\xa0mile")
     ];
 };
