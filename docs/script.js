@@ -121,7 +121,7 @@ e6b.problems.wind.basic.heading = function () {
 e6b.problems.wind.basic.groundspeed = function () {
     var params = e6b.gen_wind_params();
     return [
-        "Groundspeed: "
+        "Predicted groundspeed: "
 	    + e6b.num(params.true_airspeed)
 	    + "\xa0kt TAS, course "
 	    + e6b.num(params.course)
@@ -142,7 +142,7 @@ e6b.problems.wind.basic.groundspeed = function () {
 e6b.problems.wind.basic.headwind = function () {
     var params = e6b.gen_wind_params();
     return [
-        "Headwind/tailwind: course "
+        "Predicted headwind/tailwind: course "
             + params.course +
             "°, wind from "
             + params.wind_dir
@@ -164,7 +164,7 @@ e6b.problems.wind.basic.headwind = function () {
 e6b.problems.wind.advanced.actual_wind = function () {
     var params = e6b.gen_wind_params();
     return [
-        "Wind aloft: "
+        "Actual wind aloft: "
             + e6b.num(params.true_airspeed)
 	    + "\xa0kt TAS,  course "
 	    + params.course
@@ -172,7 +172,7 @@ e6b.problems.wind.advanced.actual_wind = function () {
 	    + params.heading
 	    + "°, "
 	    + e6b.num(params.groundspeed)
-            + '\xa0kt GS.',
+            + '\xa0kt groundspeed.',
 	"Wind from "
             + e6b.num(params.wind_dir)
 	    + "°\xa0@\xa0"
@@ -229,9 +229,9 @@ e6b.gen_dst_params = function () {
 e6b.problems.calc.basic.speed = function () {
     var params = e6b.gen_dst_params();
     return [
-        "Calculate groundspeed after flying "
-            + e6b.num(params.dist, "nautical\xa0mile")
-            + " in "
+        "Actual groundspeed: "
+            + e6b.num(params.dist)
+            + "\xa0nm in "
             + e6b.hours(params.time)
             + ".",
         e6b.num(params.speed)
@@ -243,15 +243,16 @@ e6b.problems.calc.basic.speed = function () {
 /**
  * Calculator problem: time from speed and distance
  */
-e6b.problems.calc.basic.time = function () {
+e6b.problems.calc.basic.ete = function () {
     var params = e6b.gen_dst_params();
     return [
-        "Calculate time to fly "
-            + e6b.num(params.dist, "nautical\xa0mile")
-            + " at "
+        "Estimated time enroute: "
+            + e6b.num(params.dist)
+            + "\xa0nm at "
             + e6b.num(params.speed)
             + "\xa0kt.",
-        e6b.hours(params.time)
+        e6b.hours(params.time) +
+            "\xa0ETE"
     ];
 };
 
@@ -262,12 +263,13 @@ e6b.problems.calc.basic.time = function () {
 e6b.problems.calc.basic.dist = function () {
     var params = e6b.gen_dst_params();
     return [
-        "Calculate distance traveled in "
+        "Distance travelled: flying for "
             + e6b.hours(params.time)
             + " at "
             + e6b.num(params.speed)
             + "\xa0kt.",
-        e6b.num(params.dist, "nautical\xa0mile")
+        e6b.num(params.dist)
+            + "\xa0nm travelled"
     ];
 };
 
@@ -290,13 +292,13 @@ e6b.gen_bef_params = function () {
 e6b.problems.calc.basic.burn = function () {
     params = e6b.gen_bef_params();
     return [
-        "Calculate fuel consumption gallons/hour after using "
-            + e6b.num(params.fuel, 'gallon')
-            + " in "
+        "Actual GPH: "
+            + e6b.num(params.fuel)
+            + "\xa0gal in "
             + e6b.hours(params.endurance)
             + ".",
-        e6b.num(params.burn, "gallon")
-            + " / hour"
+        e6b.num(params.burn)
+            + "gph"
     ];
 };
 
@@ -307,12 +309,13 @@ e6b.problems.calc.basic.burn = function () {
 e6b.problems.calc.basic.fuel = function () {
     params = e6b.gen_bef_params();
     return [
-        "Calculate fuel used in "
+        "Fuel required: flying for "
             + e6b.hours(params.endurance)
             + ", consuming "
-            + e6b.num(params.burn, 'gallon')
-            + " / hour.",
-        e6b.num(params.fuel, 'gallon')
+            + e6b.num(params.burn)
+            + "\xa0gph.",
+        e6b.num(params.fuel)
+            + "\xa0gal"
     ];
 };
 
@@ -323,12 +326,13 @@ e6b.problems.calc.basic.fuel = function () {
 e6b.problems.calc.basic.burn = function () {
     var params = e6b.gen_bef_params();
     return [
-        "Calculate your endurance with "
-            + e6b.num(params.fuel, 'gallon')
-            + ", consuming "
-            + e6b.num(params.burn, "gallon")
-            + " / hour.",
+        "Endurance (nearest minute): "
+            + e6b.num(params.fuel)
+            + "\xa0gal on board, using "
+            + e6b.num(params.burn)
+            + "\xa0gph.",
         e6b.hours(params.endurance)
+            + " endurance"
     ];
 };
 
@@ -356,13 +360,13 @@ e6b.gen_density_alt = function () {
 e6b.problems.calc.advanced.density_alt = function () {
     var params = e6b.gen_density_alt();
     return [
-        "Calculate density altitude for "
-	    + e6b.num(params.palt, 'foot', 'feet')
-	    + " pressure altitude and "
+        "Density altitude (nearest 100\xa0ft): "
+	    + e6b.num(params.palt)
+	    + "\xa0ft pressure altitude, "
 	    + e6b.num(params.oat)
-	    + "°C outside air temperature.",
-        e6b.num(Math.round(params.dalt/100)*100, 'foot', 'feet')
-            + " density altitude"
+	    + "°C\xa0OAT.",
+        e6b.num(Math.round(params.dalt/100)*100)
+            + "\xa0ft density altitude"
     ];
 };
 
@@ -373,15 +377,15 @@ e6b.problems.calc.advanced.density_alt = function () {
 e6b.problems.calc.advanced.true_airspeed = function () {
     var params = e6b.gen_density_alt();
     return [
-        "Calculate true airspeed for "
+        "True airspeed: "
             + e6b.num(params.cas, 'knot')
-            + " calibrated airspeed, "
-            + e6b.num(params.palt, 'foot', 'feet')
-            + " pressure altitude, "
+            + "\xa0kt\xa0CAS, "
+            + e6b.num(params.palt)
+            + "\xa0ft pressure altitude, "
             + e6b.num(params.oat)
-            + "°C outside air temperature.",
-        e6b.num(params.true_airspeed, 'knot')
-            + ' true airspeed'
+            + "°C\xa0OAT.",
+        e6b.num(params.true_airspeed)
+            + "\xa0kt\xa0TAS"
     ];
 };
 
@@ -412,17 +416,17 @@ e6b.problems.calc.advanced.true_altitude = function () {
     var true_alt = Math.round((indicated_alt + ((indicated_alt - station_elev) / 1000 * delta_temp * 4)) / 100) * 100;
 
     return [
-	"Calculate true altitude for station elevation "
-            + e6b.num(station_elev, 'foot', 'feet')
-            + " MSL, indicated altitude "
-            + e6b.num(indicated_alt, 'foot', 'feet')
-            + ", pressure altitude "
-            + e6b.num(pressure_alt, 'foot', 'feet')
-            + ", outside air temperature "
+	"True altitude (nearest 100\xa0ft): "
+            + e6b.num(indicated_alt)
+            + "\xa0ft indicated altitude, "
             + e6b.num(oat)
-            + "°C.",
-	e6b.num(true_alt, 'foot', 'feet')
-            + ' true altitude'
+            + "°C\xa0OAT, "
+            + e6b.num(pressure_alt)
+            + "\xa0ft pressure altitude, reporting station elevation "
+            + e6b.num(station_elev)
+            + "\xa0ft\xa0MSL",
+	e6b.num(true_alt)
+            + "\xa0ft true altitude"
     ];
 };
 
@@ -437,23 +441,23 @@ e6b.problems.calc.advanced.vertical_speed = function () {
     switch (e6b.rand(0, 2)) {
     case 0:
         return [
-            "Calculate feet / nautical mile: ground speed "
-                + e6b.num(gs, "knot")
-                + ", vertical speed "
-                + e6b.num(fpm, "foot", "feet")
-                + " / minute.",
-            e6b.num(fpnm, "foot", "feet")
-                + " / nautical mile"
+            "Climb gradiant (ft/nm): "
+                + e6b.num(gs)
+                + "\xa0kt groundspeed, "
+                + e6b.num(fpm)
+                + "\xa0fpm climb rate.",
+            e6b.num(fpnm)
+                + "\xa0ft/nm"
         ];
     default:
         return [
-            "Calculate feet / minute: ground speed "
-                + e6b.num(gs, "knot")
-                + ", gradiant "
-                + e6b.num(fpnm, "foot", "feet")
-                + " / nautical mile.",
-            e6b.num(fpm, "foot", "feet")
-                + " / minute"
+            "Minimum climb rate required (fpm): "
+                + e6b.num(gs)
+                + "\xa0kt groundspeed, "
+                + e6b.num(fpnm)
+                + "\xa0ft/nm gradiant.",
+            e6b.num(fpm)
+                + "\xa0fpm required"
         ];
     }
 };
@@ -473,24 +477,29 @@ e6b.problems.calc.advanced.off_course = function () {
     case 0:
         return [
             "Degrees off course: "
-                + e6b.num(dist_off_course, "nautical\xa0mile")
-                + " off course after flying "
-                + e6b.num(dist_flown, "nautical\xa0mile")
-                + ".",
+                + e6b.num(dist_off_course)
+                + "\xa0nm off course after flying "
+                + e6b.num(dist_flown)
+                + "\xa0nm.",
             e6b.num(correction_1)
-                + "° correction"
+                + "° off course"
         ];
     default:
         return [
-            "Degrees correction to destination : "
-                + e6b.num(dist_off_course, "nautical\xa0mile")
-                + " off course after flying "
-                + e6b.num(dist_flown, "nautical\xa0mile")
-                + " with "
-                + e6b.num(dist_remaining, "nautical\xa0mile")
-                + " remaining.",
-            e6b.num(correction_1 + correction_2)
-                + "° correction"
+            "Course correction to destination: "
+                + e6b.num(dist_off_course)
+                + "\xa0nm off course after flying "
+                + e6b.num(dist_flown)
+                + "\xa0nm, with "
+                + e6b.num(dist_remaining)
+                + "\xa0nm remaining.",
+            "Total correction "
+                + e6b.num(correction_1 + correction_2)
+                + "° ("
+                + e6b.num(correction_1)
+                + "° off course and "
+                + e6b.num(correction_2)
+                + "° to recapture)"
         ];
     }
 };
@@ -524,7 +533,7 @@ e6b.units_convert_volume = function () {
     case 0:
         return [
             "Convert "
-                + e6b.num(gallons, 'gallon')
+                + e6b.num(gallons, "US\xa0gallons")
                 + " to litres.",
             e6b.num(litres, 'litre')
         ];
@@ -532,7 +541,7 @@ e6b.units_convert_volume = function () {
         return [
             "Convert "
                 + e6b.num(litres, 'litre')
-                + " to gallons.",
+                + " to US\xa0gallons.",
             e6b.num(gallons, "US\xa0gallon")
         ];
     }
@@ -570,17 +579,17 @@ e6b.units_convert_fuel_weight = function () {
     switch (e6b.rand(0, 2)) {
     case 0:
         return [
-            "Calculate weight in pounds for "
-                + e6b.num(gallons, 'gallon')
+            "Weight in pounds: "
+                + e6b.num(gallons, 'US\xa0gallon')
                 + " of avgas at ISA sea level.",
             e6b.num(lb, 'pound')
         ];
     default:
         return [
-            "Calculate volume in gallons for "
+            "Volume in US\xa0gallons: "
                 + e6b.num(lb, 'pound')
                 + " of avgas at ISA sea level.",
-            e6b.num(gallons, "gallon")
+            e6b.num(gallons, "US\xa0gallon")
         ];
     }
 };
@@ -595,13 +604,13 @@ e6b.units_convert_weight = function () {
     switch (e6b.rand(0, 2)) {
     case 0:
         return [
-            "Convert " + lb + " pounds to kilograms.",
-            "" + kg + " kilograms"
+            "Convert " + lb + "\xa0pounds to kilograms.",
+            "" + kg + "\xa0kilograms"
         ];
     default:
         return [
-            "Convert " + kg + " kilograms to pounds.",
-            "" + lb + " pounds"
+            "Convert " + kg + "\xa0kilograms to pounds.",
+            "" + lb + "\xa0pounds"
         ];
     }
 };
@@ -641,13 +650,13 @@ e6b.units_convert_temperature = function () {
     switch (e6b.rand(0, 2)) {
     case 0:
         return [
-            "Convert " + celsius + "° celsius to fahrenheit.",
-            "" + fahrenheit + "° fahrenheit"
+            "Convert " + celsius + "° Celsius to Fahrenheit.",
+            "" + fahrenheit + "° Fahrenheit"
         ];
     default:
         return [
-            "Convert " + fahrenheit + "° fahrenheit to celsius.",
-            "" + celsius + "° celsius"
+            "Convert " + fahrenheit + "° Fahrenheit to Celsius.",
+            "" + celsius + "° Celsius"
         ];
     }
 };
@@ -660,11 +669,10 @@ e6b.units_multiplication = function () {
     var n1 = e6b.rand(3, 9);
     var n2 = e6b.rand(3, 99);
     return [
-        "Multiply "
-            + e6b.num(n1)
-            + '  by '
+        e6b.num(n1)
+            + ' × '
             + e6b.num(n2)
-            + '.',
+            + " =",
         e6b.num(n1 * n2)
     ];
 };
@@ -677,11 +685,10 @@ e6b.units_division = function () {
     var n1 = e6b.rand(3, 9);
     var n2 = e6b.rand(3, 99);
     return [
-        "Divide "
-            + e6b.num(n1 * n2)
-            + '  by '
+        e6b.num(n1 * n2)
+            + ' &#xf7; '
             + e6b.num(n1)
-            + '.',
+            + ' =',
         e6b.num(n2)
     ];
 };
