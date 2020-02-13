@@ -35,10 +35,11 @@ img.logo {
 .menu li {
     float: left;
     display: block;
+    text-align: center;
     padding: 0;
     margin: .5ex .5ex .5ex 0;
     border-radius: 5px;
-    background: #444444;
+    background: blue;
 }
 
 .menu li a {
