@@ -85,3 +85,11 @@ img.logo {
     width: 1.5em;
 }
 
+#help {
+    color: #aaaaaa;
+}
+
+#help li {
+    margin-bottom: 1ex;
+}
+

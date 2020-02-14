@@ -215,7 +215,7 @@ e6b.problems.calc.basic.speed = function () {
         e6b.fmt("{{n}} kt groundspeed", params.speed),
         [
             e6b.fmt("Find the distance {{n}} on the outer scale", params.dist),
-            e6b.fmt("Rotate until the time {{n}} ({{t}}) is underneath on the inner scale", params.time, params.time),
+            e6b.fmt("Rotate until the time {{n}} ({{t}}) on the inner scale is underneath {{n}}", params.time, params.time, params.dist),
             e6b.fmt("Read the speed {{n}} on the outer scale above the rate pointer (60)", params.speed)
         ]
     ];
@@ -233,7 +233,7 @@ e6b.problems.calc.basic.time = function () {
         [
             e6b.fmt("Rotate until {{n}} appears above the rate pointer (60)", params.speed),
             e6b.fmt("Find the distance {{n}} on the outer scale", params.dist),
-            e6b.fmt("Read the time {{n}} ({{t}}) directly below", params.time, params.time)
+            e6b.fmt("Read the time {{n}} ({{t}}) on the inner scale below {{n}}", params.time, params.time, params.dist)
         ]
     ];
 };
@@ -250,7 +250,7 @@ e6b.problems.calc.basic.dist = function () {
         [
             e6b.fmt("Rotate until {{n}} appears above the rate pointer (60)", params.speed),
             e6b.fmt("Find the time {{n}} ({{t}}) on the inner scale", params.time, params.time),
-            e6b.fmt("Read the distance {{n}} directly above", params.dist)
+            e6b.fmt("Read the distance {{n}} on the outer scale above {{n}}", params.dist, params.time)
         ]
     ];
 };
@@ -275,7 +275,13 @@ e6b.problems.calc.basic.burn = function () {
     params = e6b.gen_bef_params();
     return [
         e6b.fmt("Fuel-consumption rate (gph): used {{n}} gal in {{t}}", params.fuel, params.endurance),
-        e6b.fmt("{{n}} gph", params.burn)
+        e6b.fmt("{{n}} gph", params.burn),
+        [
+            e6b.fmt("Find {{n}} on the outer scale", params.fuel),
+            e6b.fmt("Rotate until {{n}} ({{t}}) appears on the inner scale below {{n}}",
+                    params.endurance, params.endurance, params.fuel),
+            e6b.fmt("Read the fuel consumption {{n}} above the rate pointer (60)", params.burn)
+        ]
     ];
 };
 
@@ -287,7 +293,12 @@ e6b.problems.calc.basic.fuel = function () {
     params = e6b.gen_bef_params();
     return [
         e6b.fmt("Fuel required (gal): flying for {{t}}, consuming {{n}} gph", params.endurance, params.burn),
-        e6b.fmt("{{n}} gal required", params.fuel)
+        e6b.fmt("{{n}} gal required", params.fuel),
+        [
+            e6b.fmt("Rotate until {{n}} appears above the rate pointer (60)", params.burn),
+            e6b.fmt("Find {{n}} ({{t}}) on the inner scale", params.endurance, params.endurance),
+            e6b.fmt("Read {{n}} on the outer scale above {{n}}", params.fuel, params.endurance)
+        ]
     ];
 };
 
@@ -299,7 +310,12 @@ e6b.problems.calc.basic.endurance = function () {
     var params = e6b.gen_bef_params();
     return [
         e6b.fmt("Endurance: {{n}} gal fuel onboard, consuming {{n}} gph", params.fuel, params.burn),
-        e6b.fmt("{{t}} endurance", params.endurance)
+        e6b.fmt("{{t}} endurance", params.endurance),
+        [
+            e6b.fmt("Rotate until {{n}} appears above the rate pointer (60)", params.burn),
+            e6b.fmt("Find {{n}} on the outer scale", params.fuel),
+            e6b.fmt("Read {{n}} ({{t}}) on the inner scale below {{n}}", params.endurance, params.endurance, params.fuel)
+        ]
     ];
 };
 
