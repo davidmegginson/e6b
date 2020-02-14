@@ -216,12 +216,8 @@ e6b.gen_dst_params = function () {
 e6b.problems.calc.basic.speed = function () {
     var params = e6b.gen_dst_params();
     return [
-        "Actual groundspeed: travelled "
-            + e6b.num(params.dist, 'nm')
-            + " in "
-            + e6b.time(params.time),
-        e6b.num(params.speed, 'kt')
-            + " groundspeed"
+        e6b.fmt("Groundspeed: travelled {{n}} kt in {{t}}", params.dist, params.time),
+        e6b.fmt("{{n}} kt groundspeed", params.speed)
     ];
 };
 
@@ -232,12 +228,8 @@ e6b.problems.calc.basic.speed = function () {
 e6b.problems.calc.basic.ete = function () {
     var params = e6b.gen_dst_params();
     return [
-        "Estimated time enroute: "
-            + e6b.num(params.dist, 'nm')
-            + " at "
-            + e6b.num(params.speed, 'kt'),
-        e6b.time(params.time) +
-            " ETE"
+        e6b.fmt("Time enroute: {{n}} nm at {{n}} kt", params.dist, params.speed),
+        e6b.fmt("{{t}} ETE", params.time)
     ];
 };
 
@@ -248,12 +240,8 @@ e6b.problems.calc.basic.ete = function () {
 e6b.problems.calc.basic.dist = function () {
     var params = e6b.gen_dst_params();
     return [
-        "Distance travelled: flying for "
-            + e6b.time(params.time)
-            + " at "
-            + e6b.num(params.speed, 'kt'),
-        e6b.num(params.dist, 'nm')
-            + " travelled"
+        e6b.fmt("Distance travelled: flying for {{t}} at {{n}} kt", params.time, params.speed),
+        e6b.fmt("{{n}} kt travelled", params.dist)
     ];
 };
 
@@ -276,11 +264,8 @@ e6b.gen_bef_params = function () {
 e6b.problems.calc.basic.burn = function () {
     params = e6b.gen_bef_params();
     return [
-        "Actual GPH: "
-            + e6b.num(params.fuel, 'gal')
-            + " in "
-            + e6b.time(params.endurance),
-        e6b.num(params.burn, 'gph')
+        e6b.fmt("Fuel-consumption rate (gph): used {{n}} gal in {{t}}", params.fuel, params.endurance),
+        e6b.fmt("{{n}} gph", params.burn)
     ];
 };
 
@@ -291,11 +276,8 @@ e6b.problems.calc.basic.burn = function () {
 e6b.problems.calc.basic.fuel = function () {
     params = e6b.gen_bef_params();
     return [
-        "Fuel required: flying for "
-            + e6b.time(params.endurance)
-            + ", consuming "
-            + e6b.num(params.burn, 'gph'),
-        e6b.num(params.fuel, 'gal')
+        e6b.fmt("Fuel required (gal): flying for {{t}}, consuming {{n}} gph", params.endurance, params.burn),
+        e6b.fmt("{{n}} gal required", params.fuel)
     ];
 };
 
@@ -303,15 +285,11 @@ e6b.problems.calc.basic.fuel = function () {
 /**
  * Calculator problem: endurance from fuel and fuel burn.
  */
-e6b.problems.calc.basic.burn = function () {
+e6b.problems.calc.basic.endurance = function () {
     var params = e6b.gen_bef_params();
     return [
-        "Endurance (nearest minute): "
-            + e6b.num(params.fuel, 'gal')
-            + " on board, burning "
-            + e6b.num(params.burn, 'gph'),
-        e6b.time(params.endurance)
-            + " endurance"
+        e6b.fmt("Endurance: {{n}} gal fuel onboard, consuming {{n}} gph", params.fuel, params.burn),
+        e6b.fmt("{{t}} endurance", params.endurance)
     ];
 };
 
