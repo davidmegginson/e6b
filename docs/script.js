@@ -404,29 +404,16 @@ e6b.problems.calc.advanced.off_course = function () {
     switch (e6b.rand(2)) {
     case 0:
         return [
-            "Degrees off course: "
-                + e6b.num(dist_off_course, 'nm')
-                + " off course after flying "
-                + e6b.num(dist_flown, 'nm'),
-            e6b.num(correction_1, '°')
-                + " off course"
+            e6b.fmt("Degrees off course: {{n}} nm off course after flying {{n}} nm",
+                    dist_off_course, dist_flown),
+            e6b.fmt("{{n}}° off course")
         ];
     default:
         return [
-            "Course correction to destination: "
-                + e6b.num(dist_off_course, 'nm')
-                + " off course after flying "
-                + e6b.num(dist_flown, 'nm')
-                + ", with "
-                + e6b.num(dist_remaining, 'nm')
-                + " remaining",
-            "Total correction "
-                + e6b.num(correction_1 + correction_2, '°')
-                + " ("
-                + e6b.num(correction_1, '°')
-                + " off course and "
-                + e6b.num(correction_2, '°')
-                + " to recapture)"
+            e6b.fmt("Heading correction to destination: {{n}} nm off course after flying {{n}} nm, {{n}} nm remaining",
+                    dist_off_course, dist_flown, dist_remaining),
+            e6b.fmt("Total correction: {{n}}° ({{n}}° off course and {{n}}° to recapture)",
+                    correction_1 + correction_2, correction_1, correction_1)
         ];
     }
 };
@@ -435,108 +422,73 @@ e6b.problems.calc.advanced.off_course = function () {
 /**
  * Conversions (all one function, so they don't come up too often)
  */
-e6b.problems.calc.advanced.units = function () {
+e6b.problems.calc.advanced.conversions = function () {
     var functions = [
-        e6b.units_convert_volume,
-        e6b.units_convert_long_distance,
-        e6b.units_convert_fuel_weight,
-        e6b.units_convert_weight,
-        e6b.units_convert_short_length,
-        e6b.units_convert_temperature,
-        e6b.units_multiplication,
-        e6b.units_division
+        e6b.convert_volume,
+        e6b.convert_distance,
+        e6b.convert_weight,
+        e6b.convert_length,
+        e6b.convert_temperature
     ];
     return functions[functions.length * Math.random() << 0]();
 };
 
  
 /**
- * Volume-conversion problems
+ * Unit conversion problems: volume
  */
-e6b.units_convert_volume = function () {
+e6b.convert_volume = function () {
     var gallons = e6b.rand(30, 1500) / 10.0; // one decimal place
     var litres = Math.round(gallons * 3.78541);
     switch (e6b.rand(0, 2)) {
     case 0:
         return [
-            "Convert "
-                + e6b.num(gallons, "US\xa0gallon", true)
-                + " to litres",
-            e6b.num(litres, 'litre', true)
+            e6b.fmt("Convert {{n}} US gallon(s) to litres", gallons),
+            e6b.fmt("{{n}} litres", litres)
         ];
     default:
         return [
-            "Convert "
-                + e6b.num(litres, 'litre', true)
-                + " to US\xa0gallons",
-            e6b.num(gallons, "gallon", true)
+            e6b.fmt("Convert {{n}} litres to US gallons", litres),
+            e6b.fmt("{{n}} US gallons", gallons)
         ];
     }
 };
 
 
 /**
- * Long-distance conversion problems.
+ * Unit conversion problems: distance
  */
-e6b.units_convert_long_distance = function () {
+e6b.convert_distance = function () {
     var distance_nm = e6b.rand(10, 300);
     var values = [distance_nm, Math.round(distance_nm * 1.15078), Math.round(distance_nm * 1.852)];
-    var units = ["nautical\xa0mile", "statute\xa0mile", "kilometer"];
+    var units = ["nautical miles", "statute miles", "kilometers"];
     var i = e6b.rand(0, 3);
     do {
         var j = e6b.rand(0, 3);
     } while (i == j);
     return [
-        "Convert "
-            + e6b.num(values[i], units[i], true)
-            + " to "
-            + e6b.plural(2, units[j], true),
-        e6b.num(values[j], units[j])
+        e6b.fmt("Convert {{n}} {{s}} to {{s}}", values[i], units[i], units[j]),
+        e6b.fmt("{{n}} {{s}}", values[j], units[j])
     ];
-};
-
-
-/**
- * Calculator problem: fuel weight
- */
-e6b.units_convert_fuel_weight = function () {
-    var gallons = e6b.rand(5, 150);
-    var lb = Math.round(gallons * 6.01);
-    switch (e6b.rand(0, 2)) {
-    case 0:
-        return [
-            "Weight in pounds: "
-                + e6b.num(gallons, 'gallon', true)
-                + " of avgas at ISA sea level",
-            e6b.num(lb, 'pound', true)
-        ];
-    default:
-        return [
-            "Volume in US\xa0gallons: "
-                + e6b.num(lb, 'pound', true)
-                + " of avgas at ISA sea level.",
-            e6b.num(gallons, "US\xa0gallon", true)
-        ];
-    }
 };
 
 
 /**
  * Calculator problem: weight
  */
-e6b.units_convert_weight = function () {
+e6b.convert_weight = function () {
     var lb = e6b.rand(10, 300);
-    var kg = Math.round(lb / 2.205);
+    var kg = Math.round(lb / 2.205 * 10) / 10;
     switch (e6b.rand(0, 2)) {
     case 0:
         return [
-            "Convert " + lb + "\xa0pounds to kilograms.",
-            "" + kg + "\xa0kilograms"
+            e6b.fmt("Convert {{n}} pounds to kilograms", lb),
+            e6b.fmt("{{n}} kilograms", kg)
         ];
     default:
         return [
-            "Convert " + kg + "\xa0kilograms to pounds.",
-            "" + lb + "\xa0pounds"
+            e6b.fmt("Convert {{n}} kilograms to pounds", kg),
+            e6b.fmt("{{n}} pounds", lb)
         ];
     }
 };
@@ -545,23 +497,19 @@ e6b.units_convert_weight = function () {
 /**
  * Calculator problem: length
  */
-e6b.units_convert_short_length = function () {
-    var feet = e6b.rand(1, 80) * 100;
+e6b.convert_length = function () {
+    var feet = e6b.rand(10, 800) * 10;
     var metres = Math.round(feet / 3.281);
     switch (e6b.rand(0, 2)) {
     case 0:
         return [
-            "Convert "
-                + e6b.num(feet, 'foot', 'feet')
-                + " to metres.",
-            e6b.num(metres, 'metre', true)
+            e6b.fmt("Convert {{n}} feet to metres", feet),
+            e6b.fmt("{{n}} metres", metres)
         ];
     default:
         return [
-            "Convert "
-                + e6b.num(metres, 'metre', true)
-                + " to feet.",
-            e6b.num(feet, 'foot', 'feet')
+            e6b.fmt("Convert {{n}} metres to feet", metres),
+            e6b.fmt("{{n}} feet", feet)
         ];
     }
 };
@@ -570,19 +518,53 @@ e6b.units_convert_short_length = function () {
 /**
  * Calculator problem: temperature
  */
-e6b.units_convert_temperature = function () {
+e6b.convert_temperature = function () {
     var celsius = e6b.rand(-40, 40);
     var fahrenheit = Math.round(celsius * (9.0 / 5) + 32);
     switch (e6b.rand(0, 2)) {
     case 0:
         return [
-            "Convert " + celsius + "° Celsius to Fahrenheit.",
-            "" + fahrenheit + "° Fahrenheit"
+            e6b.fmt("Convert {{n}}°C to Fahrenheit", celsius),
+            e6b.fmt("{{n}}°F", fahrenheit)
         ];
     default:
         return [
-            "Convert " + fahrenheit + "° Fahrenheit to Celsius.",
-            "" + celsius + "° Celsius"
+            e6b.fmt("Convert {{n}}°F to Celsius", fahrenheit),
+            e6b.fmt("{{n}}°C", celsius)
+        ];
+    }
+};
+
+
+/**
+ * Conversions (all one function, so they don't come up too often)
+ */
+e6b.problems.calc.advanced.misc = function () {
+    var functions = [
+        e6b.misc_fuel_weight,
+        e6b.misc_multiplication,
+        e6b.misc_division
+    ];
+    return functions[functions.length * Math.random() << 0]();
+};
+
+ 
+/**
+ * Unit conversion problems: fuel-weight
+ */
+e6b.misc_fuel_weight = function () {
+    var gallons = e6b.rand(5, 150);
+    var lb = Math.round(gallons * 6.01);
+    switch (e6b.rand(0, 2)) {
+    case 0:
+        return [
+            e6b.fmt("Weight in pounds: {{n}} US gallons of avgas at ISA sea level", gallons),
+            e6b.fmt("{{n}} pounds", lb)
+        ];
+    default:
+        return [
+            e6b.fmt("Volume in US gallons: {{n}} pounds of avgas at ISA sea level", lb),
+            e6b.fmt("{{n}} US gallons", gallons)
         ];
     }
 };
@@ -591,15 +573,12 @@ e6b.units_convert_temperature = function () {
 /**
  * Calculator problem: multiplication.
  */
-e6b.units_multiplication = function () {
+e6b.misc_multiplication = function () {
     var n1 = e6b.rand(3, 9);
     var n2 = e6b.rand(3, 99);
     return [
-        e6b.num(n1)
-            + ' × '
-            + e6b.num(n2)
-            + " =",
-        e6b.num(n1 * n2)
+        e6b.fmt("{{n}} × {{n}} =", n1, n2),
+        e6b.fmt("{{n}}", n1 * n2)
     ];
 };
 
@@ -607,15 +586,12 @@ e6b.units_multiplication = function () {
 /**
  * Calculator problem: division.
  */
-e6b.units_division = function () {
+e6b.misc_division = function () {
     var n1 = e6b.rand(3, 9);
     var n2 = e6b.rand(3, 99);
     return [
-        e6b.num(n1 * n2)
-            + ' &#xf7; '
-            + e6b.num(n1)
-            + ' =',
-        e6b.num(n2)
+        e6b.fmt("{{n}} ÷ {{n}} =", n1 * n2, n1),
+        e6b.fmt("{{n}}", n2)
     ];
 };
 
