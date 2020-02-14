@@ -411,8 +411,8 @@ e6b.problems.calc.advanced.true_altitude = function () {
                     station_elev, indicated_alt, indicated_alt - station_elev),
             e6b.fmt("In the True Altitude window, line up {{n}} (thousand) pressure altitude with {{n}}°C",
                     Math.round(pressure_alt / 100) / 10, oat),
-            e6b.fmt("Find {{n}} indicated altitude above station on the main inner scale", indicated_alt - station_elev),
-            e6b.fmt("Read {{n}} true altitude above station above {{n}} on the main outer scale",
+            e6b.fmt("Find {{n}} on the main inner scale", indicated_alt - station_elev),
+            e6b.fmt("Read {{n}} above {{n}} on the main outer scale",
                     true_alt - station_elev, indicated_alt - station_elev),
             e6b.fmt("Add {{n}} to the station elevation {{n}} to get the true altitude, {{n}}",
                     true_alt - station_elev, station_elev, true_alt)
