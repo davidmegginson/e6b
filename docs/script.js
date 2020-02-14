@@ -694,6 +694,15 @@ e6b.fmt = function (fmt) {
  * Ask the next question.
  */
 e6b.show_problem = function () {
+
+    function setup_help (steps) {
+        for (i in steps) {
+            var node = document.createElement("li");
+            node.textContent = steps[i];
+            e6b.nodes.help.appendChild(node);
+        }
+    }
+    
     var problems = {};
     if (e6b.type == 'wind') {
         if (location.hash == '#advanced') {
@@ -712,6 +721,12 @@ e6b.show_problem = function () {
     e6b.nodes.answer.hidden = true;
     e6b.nodes.question.textContent = info[0];
     e6b.nodes.answer.textContent = info[1];
+
+    e6b.nodes.help.innerHTML = "";
+    e6b.nodes.help.hidden = true;
+    if (info.length > 2) {
+        setup_help(info[2]);
+    }
 };
 
 
@@ -721,6 +736,7 @@ e6b.show_problem = function () {
 e6b.input = function (event) {
     if (e6b.nodes.answer.hidden) {
         e6b.nodes.answer.hidden = false;
+        e6b.nodes.help.hidden = false;
     } else {
         e6b.show_problem();
     }
@@ -778,6 +794,7 @@ window.addEventListener('load', function () {
     // Save pointers to specific nodes
     e6b.nodes.question = document.getElementById("question");
     e6b.nodes.answer = document.getElementById("answer");
+    e6b.nodes.help = document.getElementById("help");
 
     // Setup basic/advanced toggle
     e6b.setup_advanced();
