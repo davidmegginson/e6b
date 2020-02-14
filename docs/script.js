@@ -312,13 +312,9 @@ e6b.gen_density_alt = function () {
 e6b.problems.calc.advanced.density_alt = function () {
     var params = e6b.gen_density_alt();
     return [
-        "Density altitude (nearest 100\xa0ft): "
-	    + e6b.num(params.palt, 'ft')
-	    + " pressure altitude, "
-	    + e6b.num(params.oat, '°C')
-	    + " OAT",
-        e6b.num(Math.round(params.dalt/100)*100, 'ft')
-            + " density altitude"
+        e6b.fmt("Density altitude: {{n}} ft pressure altitude, {{n}}°c outside air temperature",
+                params.palt, params.oat),
+        e6b.fmt("{{n}} ft density altitude", Math.round(params.dalt / 100) * 100)
     ];
 };
 
@@ -621,8 +617,29 @@ e6b.rand_item = function (obj) {
 
 /**
  * Format values in a string.
+ * The first parameter is a format string; the remaining ones are
+ * arguments to insert into the string. The escape sequences in the
+ * format string are as follow:
+
+ * {{n}} - format argument as a number
+ * {{t}} - format argument as a time (minutes)
+ * {{s}} - insert argument as-is as a string
  */
 e6b.fmt = function (fmt) {
+
+    function time (minutes) {
+        if (minutes < 60) {
+            return minutes + " minutes";
+        } else {
+            var h = Math.floor(minutes / 60);
+            var m = minutes % 60;
+            if (m < 10) {
+                m = '0' + m;
+            }
+            return h + ":" + m;
+        }
+    }
+
     var args = Array.from(arguments).slice(1);
     var parts = fmt.split(/{{|}}/);
     var result = '';
@@ -632,77 +649,23 @@ e6b.fmt = function (fmt) {
             var spec = parts.shift();
             var arg = args.shift();
             if (spec == 'n') {
-                result += e6b.num(arg);
+                result += arg.toLocaleString();
             } else if (spec == 't') {
-                result += e6b.time(arg);
+                result += time(arg);
             } else if (spec == 's') {
                 result += arg;
             } else {
-                alert("Bad format string " + spec);
+                console.error("Unrecognised format string", s);
             }
         }
     }
+    if (parts.length > 0) {
+        console.error("Unused format-string specs", parts);
+    }
+    if (args.length > 0) {
+        console.error("Unused arguments", args);
+    }
     return result;
-};
-
-
-/**
- * Pluralise units if necessary.
- * if plural is just true, add an s
- */
-e6b.plural = function (n, singular, plural) {
-    if (plural === true) {
-        plural = singular + "s";
-    } else if (!plural) {
-        plural = singular;
-    }
-    return (n == 1 ? singular : plural);
-};
-
-
-/**
- * Format a number in the current locale string, and optionally add units.
- */
-e6b.num = function (n, unit, unit_plural) {
-    var s = n.toLocaleString();
-    if (unit) {
-        if (unit == '°') {
-            return s + unit;
-        } else {
-            return s + "\xa0" + e6b.plural(n, unit, unit_plural);
-        }
-    } else {
-        return s;
-    }
-};
-
-
-/**
- * Display minutes as HH:MM
- */
-e6b.time = function(minutes) {
-    if (minutes < 60) {
-        return e6b.num(minutes)
-            + "\xa0min";
-    } else {
-        var h = Math.floor(minutes / 60);
-        var m = minutes % 60;
-        if (m < 10) {
-            m = '0' + m;
-        }
-        return h + ":" + m;
-    }
-};
-
-
-/**
- * Display wind direction and speed
- */
-e6b.wind = function (direction, speed) {
-    return e6b.num(direction)
-        + "°\xa0@\xa0"
-        + e6b.num(speed)
-        + "\xa0kt";
 };
 
 
