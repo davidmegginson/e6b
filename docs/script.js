@@ -112,7 +112,7 @@ e6b.problems.wind.basic.heading = function () {
 e6b.problems.wind.basic.groundspeed = function () {
     var params = e6b.gen_wind_params();
     return [
-        e6b.fmt("Groundspeed: {{n}} kt true airspeed, course {{n}}°, wind from {{n}}° @ {{n}} kt",
+        e6b.fmt("Groundspeed (kt): {{n}} kt true airspeed, course {{n}}°, wind from {{n}}° @ {{n}} kt",
                 params.true_airspeed, params.course, params.wind_dir, params.wind_speed),
         e6b.fmt("{{n}} kt groundspeed", params.groundspeed)
     ];
@@ -125,7 +125,7 @@ e6b.problems.wind.basic.groundspeed = function () {
 e6b.problems.wind.basic.headwind = function () {
     var params = e6b.gen_wind_params();
     return [
-        e6b.fmt("Headwind/tailwind: course {{n}}°, wind from {{n}}° @ {{n}} kt",
+        e6b.fmt("Headwind/tailwind (kt): course {{n}}°, wind from {{n}}° @ {{n}} kt",
                 params.course, params.wind_dir, params.wind_speed),
         (params.headwind == 0 ? "No headwind"
          : e6b.fmt("{{n}} kt {{s}}", Math.abs(params.headwind), (params.headwind < 0 ? 'tailwind' : 'headwind')))
@@ -165,14 +165,9 @@ e6b.problems.wind.advanced.course = function () {
 e6b.problems.wind.advanced.true_airspeed = function () {
     var params = e6b.gen_wind_params();
     return [
-        "True airspeed: course "
-            + e6b.num(params.course, '°')
-            + ", "
-            + e6b.num(params.groundspeed, 'kt')
-            + " groundspeed, wind from "
-            + e6b.wind(params.wind_dir, params.wind_speed),
-        e6b.num(e6b.true_airspeed, 'kt')
-            + " true airspeed"
+        e6b.fmt("True airspeed (kt): course {{n}}°, {{n}} kt groundspeed, wind from {{n}}° @ {{n}} kt",
+                params.course, params.groundspeed, params.wind_dir, params.wind_speed),
+        e6b.fmt("{{n}} kt true airspeed", params.true_airspeed)
     ];
 };
 
@@ -334,15 +329,9 @@ e6b.problems.calc.advanced.density_alt = function () {
 e6b.problems.calc.advanced.true_airspeed = function () {
     var params = e6b.gen_density_alt();
     return [
-        "True airspeed: "
-            + e6b.num(params.cas, 'kt')
-            + " calibrated airspeed, "
-            + e6b.num(params.palt, 'ft')
-            + " pressure altitude, "
-            + e6b.num(params.oat, '°C')
-            + " OAT",
-        e6b.num(params.true_airspeed, 'kt')
-            + " true airspeed"
+        e6b.fmt("True airspeed (kt): {{n}} kt calibrated airspeed, {{n}} ft pressure altitude, {{n}}°C outside air temperature",
+                params.cas, params.palt, params.oat),
+        e6b.fmt("{{n}} kt true airspeed", params.true_airspeed)
     ];
 };
 
@@ -373,17 +362,9 @@ e6b.problems.calc.advanced.true_altitude = function () {
     var true_alt = Math.round((indicated_alt + ((indicated_alt - station_elev) / 1000 * delta_temp * 4)) / 100) * 100;
 
     return [
-	"True altitude (nearest 100\xa0ft): "
-            + e6b.num(indicated_alt, 'ft')
-            + " indicated altitude, "
-            + e6b.num(oat, '°C')
-            + " OAT, "
-            + e6b.num(pressure_alt, 'ft')
-            + " pressure altitude, reporting station elevation "
-            + e6b.num(station_elev, 'ft')
-            + " MSL",
-	e6b.num(true_alt, 'ft')
-            + " true altitude"
+        e6b.fmt("True altitude: {{n}} ft indicated altitude, {{n}}°C OAT, {{n}} ft pressure altitude, {{n}} ft MSL station elevation",
+                indicated_alt, oat, pressure_alt, station_elev),
+        e6b.fmt("{{n}} ft true altitude", true_alt)
     ];
 };
 
@@ -398,22 +379,13 @@ e6b.problems.calc.advanced.vertical_speed = function () {
     switch (e6b.rand(0, 2)) {
     case 0:
         return [
-            "Climb gradiant (ft/nm): "
-                + e6b.num(gs, 'kt')
-                + " groundspeed, "
-                + e6b.num(fpm, 'fpm')
-                + " climb rate",
-            e6b.num(fpnm, 'ft/nm')
+            e6b.fmt("Climb gradiant (ft/nm): {{n}} kt groundspeed, {{n}} fpm climb rate", gs, fpm),
+            e6b.fmt("{{n}} ft/nm climb gradiant", fpnm)
         ];
     default:
         return [
-            "Minimum climb rate required (fpm): "
-                + e6b.num(gs, 'kt')
-                + " groundspeed, "
-                + e6b.num(fpnm, 'ft/nm')
-                + " climb gradiant.",
-            e6b.num(fpm, 'fpm')
-                + " required"
+            e6b.fmt("Climb rate required (fpm): {{n}} kt groundspeed, {{n}} ft/nm gradiant", gs, fpnm),
+            e6b.fmt("{{n}} fpm required", fpm)
         ];
     }
 };
