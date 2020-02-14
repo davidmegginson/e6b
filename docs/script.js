@@ -99,14 +99,9 @@ e6b.gen_wind_params = function () {
 e6b.problems.wind.basic.heading = function () {
     var params = e6b.gen_wind_params();
     return [
-        "Heading to fly: "
-	    + e6b.num(params.true_airspeed, 'kt')
-	    + " true airspeed, course "
-	    + params.course
-	    + "°, wind from "
-            + e6b.wind(params.wind_dir, params.wind_speed),
-        "Fly heading "
-            + e6b.num(params.heading, '°')
+        e6b.fmt("Heading: {{n}} kt true airspeed, course {{n}}°, wind from {{n}}° @ {{n}} kt",
+                params.true_airspeed, params.course, params.wind_dir, params.wind_speed),
+        e6b.fmt("Fly heading {{n}}°", params.heading)
     ];
 };
 
@@ -117,14 +112,9 @@ e6b.problems.wind.basic.heading = function () {
 e6b.problems.wind.basic.groundspeed = function () {
     var params = e6b.gen_wind_params();
     return [
-        "Predicted groundspeed: "
-	    + e6b.num(params.true_airspeed, 'kt')
-	    + " true airspeed, course "
-	    + e6b.num(params.course, '°')
-	    + ", wind from "
-            + e6b.wind(params.wind_dir, params.wind_speed),
-        e6b.num(params.groundspeed, 'kt')
-            + " groundspeed"
+        e6b.fmt("Groundspeed: {{n}} kt true airspeed, course {{n}}°, wind from {{n}}° @ {{n}} kt",
+                params.true_airspeed, params.course, params.wind_dir, params.wind_speed),
+        e6b.fmt("{{n}} kt groundspeed", params.groundspeed)
     ];
 };
 
@@ -135,14 +125,10 @@ e6b.problems.wind.basic.groundspeed = function () {
 e6b.problems.wind.basic.headwind = function () {
     var params = e6b.gen_wind_params();
     return [
-        "Predicted headwind/tailwind: course "
-            + params.course
-            + "°, wind from "
-            + e6b.wind(params.wind_dir, params.wind_speed),
-        (params.headwind == 0 ?
-         "No headwind" :
-         e6b.num(Math.abs(params.headwind), 'kt')
-         + (params.headwind < 0 ? ' tailwind' : ' headwind'))
+        e6b.fmt("Headwind/tailwind: course {{n}}°, wind from {{n}}° @ {{n}} kt",
+                params.course, params.wind_dir, params.wind_speed),
+        (params.headwind == 0 ? "No headwind"
+         : e6b.fmt("{{n}} kt {{s}}", Math.abs(params.headwind), (params.headwind < 0 ? 'tailwind' : 'headwind')))
     ];
 };
 
@@ -150,20 +136,12 @@ e6b.problems.wind.basic.headwind = function () {
 /**
  * Wind problem: calculate wind aloft.
  */
-e6b.problems.wind.advanced.actual_wind = function () {
+e6b.problems.wind.advanced.wind_aloft = function () {
     var params = e6b.gen_wind_params();
     return [
-        "Actual wind aloft: "
-            + e6b.num(params.true_airspeed, 'kt')
-	    + "true airspeed,  course "
-	    + e6b.num(params.course, '°')
-	    + ", heading "
-	    + e6b.num(params.heading, '°')
-	    + ", "
-	    + e6b.num(params.groundspeed, 'kt')
-            + ' groundspeed.',
-	"Wind from "
-            + e6b.wind(params.wind_dir, params.wind_speed)
+        e6b.fmt("Wind aloft: {{n}} kt true airspeed, course {{n}}°, heading {{n}}°, {{n}} kt groundspeed",
+                params.true_airspeed, params.course, params.heading, params.groundspeed),
+        e6b.fmt("Wind from {{n}}° @ {{n}} kt", params.wind_dir, params.wind_speed)
     ];
 };
 
@@ -171,18 +149,13 @@ e6b.problems.wind.advanced.actual_wind = function () {
 /**
  * Wind problem: calculate actual course.
  */
-e6b.problems.wind.advanced.true_course = function () {
+e6b.problems.wind.advanced.course = function () {
     var params = e6b.gen_wind_params();
     return [
-        "Actual course: heading "
-            + e6b.num(params.heading, '°')
-            + ", "
-            + e6b.num(params.groundspeed, 'kt')
-            + " groundspeed, wind from "
-            + e6b.wind(params.wind_dir, params.wind_speed),
-        "Course "
-            + e6b.num(params.course, '°')
-    ]
+        e6b.fmt("Course over the ground: heading {{n}}°, {{n}} kt groundspeed, wind from {{n}}° @ {{n}} kt",
+                params.heading, params.groundspeed, params.wind_dir, params.wind_speed),
+        e6b.fmt("Course {{n}}°", params.course)
+    ];
 }
 
 
@@ -212,15 +185,10 @@ e6b.problems.wind.advanced.runway_crosswind = function () {
     var wind_speed = e6b.rand(15, 25);
     var crosswind = e6b.get_crosswind(runway * 10, wind_dir, wind_speed);
     return [
-        "Crosswind: runway "
-            + e6b.num(runway)
-            + ", wind from "
-            + e6b.wind(wind_dir, wind_speed),
-        crosswind == 0 ? "No crosswind"
-            : e6b.num(Math.abs(crosswind), 'kt')
-            + " crosswind "
-            + (crosswind < 0 ? "from the left" : "from the right")
-    ]
+        e6b.fmt("Crosswind: Runway {{n}}, wind from {{n}}° @ {{n}} kt", runway, wind_dir, wind_speed),
+        (crosswind == 0 ? "No crosswind"
+         : e6b.fmt("{{n}} kt crosswind from the {{s}}", crosswind, (crosswind < 0 ? "left" : "right")))
+    ];
 };
 
 
@@ -722,6 +690,33 @@ e6b.rand = function(min, max) {
 e6b.rand_item = function (obj) {
     var keys = Object.keys(obj);
     return obj[keys[keys.length * Math.random() << 0]];
+};
+
+
+/**
+ * Format values in a string.
+ */
+e6b.fmt = function (fmt) {
+    var args = Array.from(arguments).slice(1);
+    var parts = fmt.split(/{{|}}/);
+    var result = '';
+    while (parts.length > 0) {
+        result += parts.shift();
+        if (parts.length > 0 && args.length > 0) {
+            var spec = parts.shift();
+            var arg = args.shift();
+            if (spec == 'n') {
+                result += e6b.num(arg);
+            } else if (spec == 't') {
+                result += e6b.time(arg);
+            } else if (spec == 's') {
+                result += arg;
+            } else {
+                alert("Bad format string " + spec);
+            }
+        }
+    }
+    return result;
 };
 
 
