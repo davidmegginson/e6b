@@ -211,8 +211,13 @@ e6b.gen_dst_params = function () {
 e6b.problems.calc.basic.speed = function () {
     var params = e6b.gen_dst_params();
     return [
-        e6b.fmt("Groundspeed: travelled {{n}} kt in {{t}}", params.dist, params.time),
-        e6b.fmt("{{n}} kt groundspeed", params.speed)
+        e6b.fmt("Groundspeed: travelled {{n}} nm in {{t}}", params.dist, params.time),
+        e6b.fmt("{{n}} kt groundspeed", params.speed),
+        [
+            e6b.fmt("Find the distance {{n}} on the outer scale", params.dist),
+            e6b.fmt("Rotate until the time {{n}} ({{t}}) is underneath on the inner scale", params.time, params.time),
+            e6b.fmt("Read the speed {{n}} on the outer scale above the rate pointer (60)", params.speed)
+        ]
     ];
 };
 
@@ -220,11 +225,16 @@ e6b.problems.calc.basic.speed = function () {
 /**
  * Calculator problem: time from speed and distance
  */
-e6b.problems.calc.basic.ete = function () {
+e6b.problems.calc.basic.time = function () {
     var params = e6b.gen_dst_params();
     return [
         e6b.fmt("Time enroute: {{n}} nm at {{n}} kt", params.dist, params.speed),
-        e6b.fmt("{{t}} ETE", params.time)
+        e6b.fmt("{{t}} ETE", params.time),
+        [
+            e6b.fmt("Rotate until {{n}} appears above the rate pointer (60)", params.speed),
+            e6b.fmt("Find the distance {{n}} on the outer scale", params.dist),
+            e6b.fmt("Read the time {{n}} ({{t}}) directly below", params.time, params.time)
+        ]
     ];
 };
 
@@ -236,7 +246,12 @@ e6b.problems.calc.basic.dist = function () {
     var params = e6b.gen_dst_params();
     return [
         e6b.fmt("Distance travelled: flying for {{t}} at {{n}} kt", params.time, params.speed),
-        e6b.fmt("{{n}} kt travelled", params.dist)
+        e6b.fmt("{{n}} kt travelled", params.dist),
+        [
+            e6b.fmt("Rotate until {{n}} appears above the rate pointer (60)", params.speed),
+            e6b.fmt("Find the time {{n}} ({{t}}) on the inner scale", params.time, params.time),
+            e6b.fmt("Read the distance {{n}} directly above", params.dist)
+        ]
     ];
 };
 
