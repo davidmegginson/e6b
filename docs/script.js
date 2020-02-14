@@ -345,7 +345,13 @@ e6b.problems.calc.advanced.density_alt = function () {
     return [
         e6b.fmt("Density altitude: {{n}} ft pressure altitude, {{n}}°c outside air temperature",
                 params.palt, params.oat),
-        e6b.fmt("{{n}} ft density altitude", Math.round(params.dalt / 100) * 100)
+        e6b.fmt("{{n}} ft density altitude", Math.round(params.dalt / 100) * 100),
+        [
+            e6b.fmt("In the bottom section of the True Airspeed window, line up {{n}} (thousand) pressure altitude with {{n}}°C",
+                    params.palt / 1000, params.oat),
+            e6b.fmt("In the top section, read {{n}} (thousand) under the Density Altitude pointer",
+                    Math.round(params.dalt / 100) / 10)
+        ]
     ];
 };
 
@@ -358,7 +364,13 @@ e6b.problems.calc.advanced.true_airspeed = function () {
     return [
         e6b.fmt("True airspeed (kt): {{n}} kt calibrated airspeed, {{n}} ft pressure altitude, {{n}}°C outside air temperature",
                 params.cas, params.palt, params.oat),
-        e6b.fmt("{{n}} kt true airspeed", params.true_airspeed)
+        e6b.fmt("{{n}} kt true airspeed", params.true_airspeed),
+        [
+            e6b.fmt("In the True Airspeed window, line up {{n}} (thousand) pressure altitude with {{n}}°C",
+                    params.palt / 1000, params.oat),
+            e6b.fmt("Find the calibrated airspeed {{n}} on the inner scale of the main circle", params.cas),
+            e6b.fmt("Read the true airspeed {{n}} on the outer scale above {{n}}", params.true_airspeed, params.cas)
+        ]
     ];
 };
 
@@ -367,6 +379,8 @@ e6b.problems.calc.advanced.true_airspeed = function () {
  * Calculator problem: true altitude
  */
 e6b.problems.calc.advanced.true_altitude = function () {
+    // FIXME not quite matching E6B
+    
     // station elevation, 0-5000 ft (500 ft increments)
     var station_elev = e6b.rand(0, 50) * 100;
 
@@ -391,7 +405,18 @@ e6b.problems.calc.advanced.true_altitude = function () {
     return [
         e6b.fmt("True altitude: {{n}} ft indicated altitude, {{n}}°C OAT, {{n}} ft pressure altitude, {{n}} ft MSL station elevation",
                 indicated_alt, oat, pressure_alt, station_elev),
-        e6b.fmt("{{n}} ft true altitude", true_alt)
+        e6b.fmt("{{n}} ft true altitude", true_alt),
+        [
+            e6b.fmt("Subtract {{n}} station elevation from {{n}} indicated altitude to get {{n}} (indicated altitude above station)",
+                    station_elev, indicated_alt, indicated_alt - station_elev),
+            e6b.fmt("In the True Altitude window, line up {{n}} (thousand) pressure altitude with {{n}}°C",
+                    Math.round(pressure_alt / 100) / 10, oat),
+            e6b.fmt("Find {{n}} indicated altitude above station on the main inner scale", indicated_alt - station_elev),
+            e6b.fmt("Read {{n}} true altitude above station above {{n}} on the main outer scale",
+                    true_alt - station_elev, indicated_alt - station_elev),
+            e6b.fmt("Add {{n}} to the station elevation {{n}} to get the true altitude, {{n}}",
+                    true_alt - station_elev, station_elev, true_alt)
+        ]
     ];
 };
 
@@ -407,12 +432,22 @@ e6b.problems.calc.advanced.vertical_speed = function () {
     case 0:
         return [
             e6b.fmt("Climb gradiant (ft/nm): {{n}} kt groundspeed, {{n}} fpm climb rate", gs, fpm),
-            e6b.fmt("{{n}} ft/nm climb gradiant", fpnm)
+            e6b.fmt("{{n}} ft/nm climb gradiant", fpnm),
+            [
+                e6b.fmt("Rotate until {{n}} appears above the rate pointer (60)", gs),
+                e6b.fmt("Find {{n}} on the inner scale", fpm),
+                e6b.fmt("Read {{n}} on the outer scale above {{n}}", fpnm, fpm)
+            ]
         ];
     default:
         return [
             e6b.fmt("Climb rate required (fpm): {{n}} kt groundspeed, {{n}} ft/nm gradiant", gs, fpnm),
-            e6b.fmt("{{n}} fpm required", fpm)
+            e6b.fmt("{{n}} fpm required", fpm),
+            [
+                e6b.fmt("Rotate until {{n}} appears above the rate pointer (60)", gs),
+                e6b.fmt("Find {{n}} on the outer scale", fpnm),
+                e6b.fmt("Read {{n}} on the inner scale below {{n}}", fpm, fpnm)
+            ]
         ];
     }
 };
