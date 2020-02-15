@@ -200,7 +200,7 @@ e6b.gen_dst_params = function () {
     var params = {};
     params.speed = e6b.rand(60, 300);
     params.time = e6b.rand(5, 180);
-    params.dist = e6b.approx(params.speed / 60.0 * params.time);
+    params.dist = Math.round(params.speed / 60.0 * params.time);
     return params;
 };
 
@@ -263,7 +263,7 @@ e6b.gen_bef_params = function () {
     var params = {};
     params.burn = e6b.rand(50, 300) / 10.0; // one decimal place
     params.endurance = e6b.rand(5, 180);
-    params.fuel = e6b.approx((params.burn / 60) * params.endurance);
+    params.fuel = Math.round((params.burn / 60) * params.endurance);
     return params;
 };
 
