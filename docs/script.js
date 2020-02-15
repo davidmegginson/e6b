@@ -520,12 +520,24 @@ e6b.convert_volume = function () {
     case 0:
         return [
             e6b.fmt("Convert {{n}} US gallon(s) to litres", gallons),
-            e6b.fmt("{{n}} litres", litres)
+            e6b.fmt("{{n}} litres", litres),
+            [
+                "Rotate until the US gal pointer on the outer scale (near 13) lines up with the litres pointer on the inner scale (near 50)",
+                e6b.fmt("Find the number of US gallons, {{n}}, on the outer scale", gallons),
+                e6b.fmt("Read the number of litres, {{n}}, on the inner scale directly below {{n}}",
+                        litres, gallons)
+            ]
         ];
     default:
         return [
             e6b.fmt("Convert {{n}} litres to US gallons", litres),
-            e6b.fmt("{{n}} US gallons", gallons)
+            e6b.fmt("{{n}} US gallons", gallons),
+            [
+                "Rotate until the US gallons pointer on the outer scale (near 13) lines up with the litres pointer on the inner scale (near 50)",
+                e6b.fmt("Find the number of litres, {{n}}, on the inner scale", litres),
+                e6b.fmt("Read the number of US gallons, {{n}}, on the outer scale directly above {{n}}",
+                        gallons, litres)
+            ]
         ];
     }
 };
@@ -538,13 +550,22 @@ e6b.convert_distance = function () {
     var distance_nm = e6b.rand(10, 300);
     var values = [distance_nm, Math.round(distance_nm * 1.15078), Math.round(distance_nm * 1.852)];
     var units = ["nautical miles", "statute miles", "kilometers"];
+    var locations = ["66", "76", "12"];
     var i = e6b.rand(0, 3);
     do {
         var j = e6b.rand(0, 3);
     } while (i == j);
     return [
         e6b.fmt("Convert {{n}} {{s}} to {{s}}", values[i], units[i], units[j]),
-        e6b.fmt("{{n}} {{s}}", values[j], units[j])
+        e6b.fmt("{{n}} {{s}}", values[j], units[j]),
+        [
+            e6b.fmt("Rotate until the {{s}} pointer on outer scale (near {{s}}) lines up with the {{s}} pointer on the inner scale (near {{s}})",
+                    units[i], locations[i], units[j], locations[j]),
+            e6b.fmt("Find the number of {{s}}, {{n}}, on the outer scale",
+                    units[i], values[i]),
+            e6b.fmt("Read the number of {{s}}, {{n}}, on the inner scale directly below {{n}}",
+                    units[j], values[j], values[i])
+        ]
     ];
 };
 
@@ -559,12 +580,22 @@ e6b.convert_weight = function () {
     case 0:
         return [
             e6b.fmt("Convert {{n}} pounds to kilograms", lb),
-            e6b.fmt("{{n}} kilograms", kg)
+            e6b.fmt("{{n}} kilograms", kg),
+            [
+                "Rotate until the kilograms pointer on the outer scale (near 17) lines up with the pounds pointer on the inner scale (near 36)",
+                e6b.fmt("Find the number of kilograms, {{n}}, on the outer scale", kg),
+                e6b.fmt("Read the number of pounds, {{n}}, on the inner scale directly below {{n}}", lb, kg)
+            ]
         ];
     default:
         return [
             e6b.fmt("Convert {{n}} kilograms to pounds", kg),
-            e6b.fmt("{{n}} pounds", lb)
+            e6b.fmt("{{n}} pounds", lb),
+            [
+                "Rotate until the kilograms pointer on the outer scale (near 17) lines up with the pounds pointer on the inner scale (near 36)",
+                e6b.fmt("Find the number of pounds, {{n}}, on the inner scale", lb),
+                e6b.fmt("Read the number of kilograms, {{n}}, on the outer scale directly above {{n}}", kg, lb)
+            ]
         ];
     }
 };
@@ -580,12 +611,22 @@ e6b.convert_length = function () {
     case 0:
         return [
             e6b.fmt("Convert {{n}} feet to metres", feet),
-            e6b.fmt("{{n}} metres", metres)
+            e6b.fmt("{{n}} metres", metres),
+            [
+                "Rotate until the feet pointer on the outer scale (near 14) lines up with the metres pointer on the inner scale (near 44)",
+                e6b.fmt("Find the number of feet, {{n}}, on the outer scale", feet),
+                e6b.fmt("Read the number of metres, {{n}}, on the inner scale directly below {{n}}", metres, feet)
+            ]
         ];
     default:
         return [
             e6b.fmt("Convert {{n}} metres to feet", metres),
-            e6b.fmt("{{n}} feet", feet)
+            e6b.fmt("{{n}} feet", feet),
+            [
+                "Rotate until the feet pointer on the outer scale (near 14) lines up with the metres pointer on the inner scale (near 44)",
+                e6b.fmt("Find the number of metres, {{n}}, on the inner scale", metres),
+                e6b.fmt("Read the number of feet, {{n}}, on the outer scale directly above {{n}}", feet, metres)
+            ]
         ];
     }
 };
@@ -653,12 +694,22 @@ e6b.misc_fuel_weight = function () {
     case 0:
         return [
             e6b.fmt("Weight in pounds: {{n}} US gallons of avgas at ISA sea level", gallons),
-            e6b.fmt("{{n}} pounds", lb)
+            e6b.fmt("{{n}} pounds", lb),
+            [
+                "Rotate so that the fuel lbs pointer on the outer scale (near 77) lines up with the US gallons pointer on the inner scale (near 13)",
+                e6b.fmt("Find the number of gallons, {{n}}, on the inner scale", gallons),
+                e6b.fmt("Read the number of pounds, {{n}}, on the outer scale directly above {{n}}", lb, gallons)
+            ]
         ];
     default:
         return [
             e6b.fmt("Volume in US gallons: {{n}} pounds of avgas at ISA sea level", lb),
-            e6b.fmt("{{n}} US gallons", gallons)
+            e6b.fmt("{{n}} US gallons", gallons),
+            [
+                "Rotate so that the fuel lbs pointer on the outer scale (near 77) lines up with the US gallons pointer on the inner scale (near 13)",
+                e6b.fmt("Find the number of pounds, {{n}}, on the outer scale", lb),
+                e6b.fmt("Read the number of gallons, {{n}}, on the inner scale directly below {{n}}", gallons, lb)
+            ]
         ];
     }
 };
@@ -672,7 +723,12 @@ e6b.misc_multiplication = function () {
     var n2 = e6b.rand(3, 99);
     return [
         e6b.fmt("{{n}} × {{n}} =", n1, n2),
-        e6b.fmt("{{n}}", n1 * n2)
+        e6b.fmt("{{n}}", n1 * n2),
+        [
+            e6b.fmt("Rotate so that the units pointer (10) on the inner scale is below {{n}} on the outer scale", n1),
+            e6b.fmt("Find {{n}} on the inner scale", n2),
+            e6b.fmt("Read the product, {{n}}, on the outer scale directly above {{n}}", n1 * n2, n2)
+        ]
     ];
 };
 
@@ -685,7 +741,12 @@ e6b.misc_division = function () {
     var n2 = e6b.rand(3, 99);
     return [
         e6b.fmt("{{n}} ÷ {{n}} =", n1 * n2, n1),
-        e6b.fmt("{{n}}", n2)
+        e6b.fmt("{{n}}", n2),
+        [
+            e6b.fmt("Find {{n}} on the outer scale", n1*n2),
+            e6b.fmt("Rotate so that {{n}} appears on the inner scale directly below {{n}}", n1, n1*n2),
+            e6b.fmt("Read the quotient, {{n}}, on the outer scale directly above the units pointer (10)", n2)
+        ]
     ];
 };
 
@@ -753,7 +814,7 @@ e6b.fmt = function (fmt) {
             } else if (spec == 's') {
                 result += arg;
             } else {
-                console.error("Unrecognised format string", s);
+                console.error("Unrecognised format string", spec);
             }
         }
     }
