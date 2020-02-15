@@ -719,15 +719,15 @@ e6b.misc_fuel_weight = function () {
  * Calculator problem: multiplication.
  */
 e6b.misc_multiplication = function () {
-    var n1 = e6b.rand(3, 9);
+    var n1 = e6b.rand(3, 99);
     var n2 = e6b.rand(3, 99);
     return [
         e6b.fmt("{{n}} × {{n}} =", n1, n2),
-        e6b.fmt("{{n}}", n1 * n2),
+        e6b.fmt("(approximately) {{n}}", e6b.approx(n1 * n2)),
         [
             e6b.fmt("Rotate so that the units pointer (10) on the inner scale is below {{n}} on the outer scale", n1),
             e6b.fmt("Find {{n}} on the inner scale", n2),
-            e6b.fmt("Read the product, {{n}}, on the outer scale directly above {{n}}", n1 * n2, n2)
+            e6b.fmt("Read the approximate product, {{n}}, on the outer scale directly above {{n}}", e6b.approx(n1 * n2), n2)
         ]
     ];
 };
@@ -763,6 +763,23 @@ e6b.misc_division = function () {
 e6b.rand = function(min, max) {
     return Math.floor(Math.random() * (max - min) + min)
 };
+
+
+/**
+ * Approximate a value based on order of magnitude.
+ */
+e6b.approx = function (n) {
+    // FIXME - there's probably an elegant way to do this
+    if (n > 10000) {
+        return Math.round(n / 1000) * 1000;
+    } else if (n > 1000) {
+        return Math.round(n / 100) * 100;
+    } else if (n > 100) {
+        return Math.round(n / 10) * 10;
+    } else {
+        return Math.round(n);
+    }
+}
 
 
 /**
