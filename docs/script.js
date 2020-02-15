@@ -486,11 +486,11 @@ e6b.problems.calc.advanced.off_course = function () {
  */
 e6b.problems.calc.advanced.conversions = function () {
     var functions = [
+        e6b.convert_temperature,
         e6b.convert_volume,
         e6b.convert_distance,
         e6b.convert_weight,
-        e6b.convert_length,
-        e6b.convert_temperature
+        e6b.convert_length
     ];
     return functions[functions.length * Math.random() << 0]();
 };
@@ -587,12 +587,30 @@ e6b.convert_temperature = function () {
     case 0:
         return [
             e6b.fmt("Convert {{n}}°C to Fahrenheit", celsius),
-            e6b.fmt("{{n}}°F", fahrenheit)
+            e6b.fmt("{{n}}°F", fahrenheit),
+            [
+                e6b.fmt("If your E6B has a temperature scale, simply read {{n}}°F adjacent to {{n}}°C; otherwise …",
+                        fahrenheit, celsius),
+                "Rotate so that 36 on the outer scale appears above 20 on the inner scale",
+                e6b.fmt("Add 40 to {{n}} to get {{n}}, and find {{n}} on the inner scale",
+                        celsius, celsius+40, celsius+40),
+                e6b.fmt("Read {{n}} on the outer scale above {{n}}, and subtract 40 to get {{n}}°F",
+                        fahrenheit+40, celsius+40, fahrenheit)
+            ]
         ];
     default:
         return [
             e6b.fmt("Convert {{n}}°F to Celsius", fahrenheit),
-            e6b.fmt("{{n}}°C", celsius)
+            e6b.fmt("{{n}}°C", celsius),
+            [
+                e6b.fmt("If your E6B has a temperature scale, simply read {{n}}°C adjacent to {{n}}°F; otherwise …",
+                        celsius, fahrenheit),
+                "Rotate so that 36 on the outer scale appears above 20 on the inner scale",
+                e6b.fmt("Add 40 to {{n}} to get {{n}}, and find {{n}} on the outer scale", 
+                        fahrenheit, fahrenheit+40, fahrenheit+40),
+                e6b.fmt("Read {{n}} on the inner scale below {{n}}, and subtract 40 to get {{n}}°C",
+                        celsius+40, fahrenheit+40, celsius)
+            ]
         ];
     }
 };
@@ -799,7 +817,7 @@ e6b.input = function (event) {
  * Reverse engineered from the E6B
  */
 e6b.density_altitude = function (pressure_altitude, temperature) {
-    var isa_temperature = 15 - (pressure_altitude / 1000 * 1.98); // difference from ISO temperature
+    var isa_temperature = 15 - ((pressure_altitude / 1000) * 1.98); // difference from ISO temperature
     var offset = (temperature - isa_temperature) * 118.8;
     return Math.round(pressure_altitude + offset);
 };
