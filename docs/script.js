@@ -468,14 +468,28 @@ e6b.problems.calc.advanced.off_course = function () {
         return [
             e6b.fmt("Degrees off course: {{n}} nm off course after flying {{n}} nm",
                     dist_off_course, dist_flown),
-            e6b.fmt("{{n}}° off course")
+            e6b.fmt("{{n}}° off course", correction_1),
+            [
+                e6b.fmt("Find the distance off course, {{n}}, on the outer scale", dist_off_course),
+                e6b.fmt("Rotate until the distance flown, {{n}}, appears on the inner scale below {{n}}", dist_flown, dist_off_course),
+                e6b.fmt("Read the number of degrees off course, {{n}}, above the rate pointer (60)", correction_1)
+            ]
         ];
     default:
         return [
             e6b.fmt("Heading correction to destination: {{n}} nm off course after flying {{n}} nm, {{n}} nm remaining",
                     dist_off_course, dist_flown, dist_remaining),
             e6b.fmt("Total correction: {{n}}° ({{n}}° off course and {{n}}° to recapture)",
-                    correction_1 + correction_2, correction_1, correction_1)
+                    correction_1 + correction_2, correction_1, correction_1),
+            [
+                e6b.fmt("Find the distance off course, {{n}}, on the outer scale", dist_off_course),
+                e6b.fmt("Rotate until the distance flown, {{n}}, appears on the inner scale below {{n}}", dist_flown, dist_off_course),
+                e6b.fmt("Read the number of degrees off course, {{n}}, above the rate pointer (60)", correction_1),
+                e6b.fmt("Rotate again, until the distance remaining, {{n}}, appears on the inner scale below {{n}}", dist_remaining, dist_off_course),
+                e6b.fmt("Read the additional heading adjustment to recapture, {{n}}, above the rate pointer (60)", correction_2),
+                e6b.fmt("Add {{n}} and {{n}} to get the total heading correction to destination, {{n}}°",
+                        correction_1, correction_2, correction_1+correction_2)
+            ]
         ];
     }
 };
