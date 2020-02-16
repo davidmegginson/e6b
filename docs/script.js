@@ -89,6 +89,14 @@ e6b.gen_wind_params = function () {
     params.wind_correction_angle = e6b.get_wind_correction_angle(params.true_airspeed, params.crosswind);
     params.heading = (params.course + params.wind_correction_angle + 360) % 360;
 
+    if (params.wind_correction_angle < 0) {
+        params.wind_correction_dir = "left";
+        params.wind_correction_op = "subtract from";
+    } else {
+        params.wind_correction_dir = "right";
+        params.wind_correction_op = "add to";
+    }
+
     return params;
 };
 
@@ -101,7 +109,25 @@ e6b.problems.wind.basic.heading = function () {
     return [
         e6b.fmt("Heading: {{n}} kt true airspeed, course {{n}}°, wind from {{n}}° @ {{n}} kt",
                 params.true_airspeed, params.course, params.wind_dir, params.wind_speed),
-        e6b.fmt("Fly heading {{n}}°", params.heading)
+        e6b.fmt("Fly heading {{n}}°", params.heading),
+        [
+            e6b.fmt("Set the wind direction, {{n}}, under the \"true index\" or \"TC\" pointer", params.wind_dir),
+            e6b.fmt("Make a pencil mark {{n}} kt straight up from the centre grommet for the wind speed", params.wind_speed),
+            e6b.fmt("Set the course, {{n}}, next to the \"true index\" or \"TC\" pointer", params.course),
+            e6b.fmt("For a classic E6-B with a sliding card: slide until the pencil mark is over the true airspeed " +
+                    "{{n}}, read the wind-correction-angle {{n}} to the {{s}} under the pencil mark, and {{s}} " +
+                    "the course {{n}} to get the heading {{n}}",
+                    params.true_airspeed, Math.abs(params.wind_correction_angle), params.wind_correction_dir,
+                    params.wind_correction_op, params.course, params.heading),
+            e6b.fmt("For a CR-3/CR-5-style without a sliding card: place the true airspeed, {{n}}, above the \"TAS\" " +
+                    "pointer, read the pencil mark's position {{n}} to the {{s}} on the centre horizontal crosswind scale, " +
+                    "look up the crosswind {{n}} on the outer scale to get the course correction {{n}}° below it, " +
+                    "then {{s}} the course {{n}} to get the heading {{n}}",
+                    params.true_airspeed, Math.abs(params.crosswind), params.wind_correction_dir,
+                    Math.abs(params.crosswind), Math.abs(params.wind_correction_angle), params.wind_correction_op,
+                    params.course, params.heading)
+        ]
+                    
     ];
 };
 
