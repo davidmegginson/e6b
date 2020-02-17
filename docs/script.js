@@ -183,17 +183,68 @@ e6b.problems.wind.advanced.wind_aloft = function () {
 
 
 /**
+ * Calculate parameters for runway-wind problems.
+ */
+e6b.runway_wind_info = function () {
+    var params = {};
+    params.runway = e6b.rand(0, 36) + 1;
+    params.course = params.runway * 10;
+    params.wind_dir = (params.course + e6b.rand(-90, 90) + 360) % 360;
+    params.wind_speed = e6b.rand(5, 30);
+    params.headwind = e6b.get_headwind(params.course, params.wind_dir, params.wind_speed);
+    params.headwind_dir = (params.headwind < 0 ? "tailwind" : "headwind");
+    params.crosswind = e6b.get_crosswind(params.course, params.wind_dir, params.wind_speed);
+    params.crosswind_dir = (params.crosswind < 0 ? "left" : "right");
+    params.wind_angle = params.wind_dir - params.course;
+    return params;
+};
+
+
+/**
+ * Wind problem: calculate the runway headwind for landing/takeoff.
+ */
+e6b.problems.wind.advanced.runway_headwind = function () {
+    var params = e6b.runway_wind_info();
+    return [
+        e6b.fmt("Headwind: Runway {{n}}, wind from {{n}}° @ {{n}} kt",
+                params.runway, params.wind_dir, params.wind_speed),
+        (params.headwind == 0 ? "No headwind"
+         : e6b.fmt("{{n}} kt {{s}}", Math.abs(params.headwind), params.headwind_dir)),
+        [
+            e6b.fmt("Compare the runway heading {{n}}° and the wind direction {{n}}° to get " +
+                    "a wind angle of {{n}}° from the {{s}} side of the runway",
+                    params.course, params.wind_dir, Math.abs(params.wind_angle), params.crosswind_dir),
+            e6b.fmt("Using the wind-component grid on the card part of the E6B, " +
+                    "trace approximately a {{n}}° angle line until it intersects with a {{n}} kt curve",
+                    Math.abs(params.wind_angle), params.wind_speed),
+            e6b.fmt("Look directly left and read approximately {{n}} kt on the \"Headwind component\" axis",
+                    Math.abs(params.headwind))
+        ]
+    ];
+};
+
+
+/**
  * Wind problem: calculate the runway crosswind for landing.
  */
 e6b.problems.wind.advanced.runway_crosswind = function () {
-    var runway = e6b.rand(0, 36) + 1;
-    var wind_dir = ((runway * 10) + e6b.rand(-90, 90) + 360) % 360;
-    var wind_speed = e6b.rand(15, 25);
-    var crosswind = e6b.get_crosswind(runway * 10, wind_dir, wind_speed);
+    var params = e6b.runway_wind_info();
     return [
-        e6b.fmt("Crosswind: Runway {{n}}, wind from {{n}}° @ {{n}} kt", runway, wind_dir, wind_speed),
-        (crosswind == 0 ? "No crosswind"
-         : e6b.fmt("{{n}} kt crosswind from the {{s}}", crosswind, (crosswind < 0 ? "left" : "right")))
+        e6b.fmt("Crosswind: Runway {{n}}, wind from {{n}}° @ {{n}} kt",
+                params.runway, params.wind_dir, params.wind_speed),
+        (params.crosswind == 0 ? "No crosswind"
+         : e6b.fmt("{{n}} kt crosswind from the {{s}} side of the runway",
+                   Math.abs(params.crosswind), params.crosswind_dir)),
+        [
+            e6b.fmt("Compare the runway heading {{n}}° and the wind direction {{n}}° to get " +
+                    "a wind angle of {{n}}° to the {{s}}",
+                    params.course, params.wind_dir, Math.abs(params.wind_angle), params.crosswind_dir),
+            e6b.fmt("Using the wind-component grid on the card part of the E6B, " +
+                    "trace approximately a {{n}}° angle line until it intersects with a {{n}} kt curve",
+                    Math.abs(params.wind_angle), params.wind_speed),
+            e6b.fmt("Look directly down and read approximately {{n}} kt on the \"Crosswind component\" axis",
+                    Math.abs(params.crosswind))
+        ]             
     ];
 };
 
