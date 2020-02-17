@@ -375,7 +375,7 @@ e6b.problems.calc.basic.endurance = function () {
         [
             e6b.fmt("Rotate until the fuel consumption {{n}} gph appears above the rate pointer (60)", p.gph),
             e6b.fmt("Find the fuel available {{n}} gallons on the outer scale", p.fuel),
-            e6b.fmt("Read the endurance {{n}} ({{t}}) on the inner scale below {{n}}", p.endurance, p.endurance, p.fuel)
+            e6b.fmt("Read the endurance {{t}} on the inner scale below {{n}}", p.endurance, p.fuel)
         ]
     ];
 };
