@@ -78,7 +78,7 @@ e6b.gen_wind_params = function () {
 
     // Randomly-generated values
     params.course = e6b.rand(0, 360);
-    params.tas = e6b.rand(60, 250);
+    params.tas = e6b.rand(60, 180);
     params.wdir = e6b.rand(0, 36) * 10;
     params.wspeed = e6b.rand(5, 40);
 
@@ -158,20 +158,6 @@ e6b.problems.wind.basic.groundspeed = function () {
 
 
 /**
- * Wind problem: calculate headwind or tailwind.
- */
-e6b.problems.wind.basic.headwind = function () {
-    var params = e6b.gen_wind_params();
-    return [
-        e6b.fmt("Headwind/tailwind (kt): course {{n}}°, wind from {{n}}° @ {{n}} kt",
-                params.course, params.wdir, params.wspeed),
-        (params.headwind == 0 ? "No headwind"
-         : e6b.fmt("{{n}} kt {{s}}", Math.abs(params.headwind), (params.headwind < 0 ? 'tailwind' : 'headwind')))
-    ];
-};
-
-
-/**
  * Wind problem: calculate wind aloft.
  */
 e6b.problems.wind.advanced.wind_aloft = function () {
@@ -179,35 +165,22 @@ e6b.problems.wind.advanced.wind_aloft = function () {
     return [
         e6b.fmt("Wind aloft: {{n}} kt true airspeed, course {{n}}°, heading {{n}}°, {{n}} kt groundspeed",
                 params.tas, params.course, params.heading, params.gs),
-        e6b.fmt("Wind from {{n}}° @ {{n}} kt", params.wdir, params.wspeed)
+        e6b.fmt("Wind from {{n}}° @ {{n}} kt", params.wdir, params.wspeed),
+        [
+            e6b.fmt("Rotate to set the course {{n}}° under the \"true index\" pointer", params.course),
+            e6b.fmt("Slide the card until the centre grommet is over the groundspeed {{n}} kt", params.gs),
+            e6b.fmt("Compare the course {{n}}° to the actual heading {{n}}° to get a wind-correction " +
+                    "angle of {{n}}° to the {{s}}", params.course, params.heading, Math.abs(params.wca), params.crosswind_dir),
+            e6b.fmt("Make a pencil mark where the {{n}}° wind-correction angle on the {{s}} side crosses the " +
+                    "{{n}} kt true airspeed line", Math.abs(params.wca), params.crosswind_dir, params.tas),
+            "Rotate so that the pencil mark is on the vertical line above the grommet",
+            e6b.fmt("The wind direction, {{n}}°, is under the \"true index\" pointer", params.wdir),
+            e6b.fmt("The wind speed, {{n}} kt, is the number of knots between the grommet and the pencil mark",
+                    params.wspeed)
+        ]
     ];
 };
 
-
-/**
- * Wind problem: calculate actual course.
- */
-e6b.problems.wind.advanced.course = function () {
-    var params = e6b.gen_wind_params();
-    return [
-        e6b.fmt("Course over the ground: heading {{n}}°, {{n}} kt groundspeed, wind from {{n}}° @ {{n}} kt",
-                params.heading, params.gs, params.wdir, params.wspeed),
-        e6b.fmt("Course {{n}}°", params.course)
-    ];
-}
-
-
-/**
- * Wind problem: calculate true airspeed
- */
-e6b.problems.wind.advanced.true_airspeed = function () {
-    var params = e6b.gen_wind_params();
-    return [
-        e6b.fmt("True airspeed (kt): course {{n}}°, {{n}} kt groundspeed, wind from {{n}}° @ {{n}} kt",
-                params.course, params.gs, params.wdir, params.wspeed),
-        e6b.fmt("{{n}} kt true airspeed", params.tas)
-    ];
-};
 
 /**
  * Wind problem: calculate the runway crosswind for landing.
