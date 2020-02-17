@@ -308,7 +308,7 @@ e6b.problems.calc.basic.dist = function () {
     var p = e6b.gen_dst_params();
     return [
         e6b.fmt("Distance travelled: flying for {{t}} at {{n}} kt", p.time, p.speed),
-        e6b.fmt("{{n}} kt travelled", p.dist),
+        e6b.fmt("{{n}} nm travelled", p.dist),
         [
             e6b.fmt("Rotate until the speed {{n}} kt appears above the rate pointer (60)", p.speed),
             e6b.fmt("Find the time {{t}} on the inner scale", p.time),
@@ -325,7 +325,7 @@ e6b.gen_bef_params = function () {
     var p = {};
     p.gph = e6b.rand(50, 300) / 10.0; // one decimal place
     p.endurance = e6b.rand(5, 180);
-    p.fuel = Math.round((p.gph / 60) * p.endurance);
+    p.fuel = Math.round((p.gph / 60) * p.endurance * 10) / 10;
     return p;
 };
 
@@ -392,8 +392,8 @@ e6b.gen_density_alt = function () {
     p.oat = 15 - (p.palt * 1.98 / 1000) + oat_offset;
     p.dalt = e6b.density_altitude(p.palt, p.oat);
     p.cas = e6b.rand(70, 250);
-    p.tas = e6b.approx(e6b.true_airspeed(p.cas, p.dalt));
-    p.oat = e6b.approx(p.oat);
+    p.tas = Math.round(e6b.true_airspeed(p.cas, p.dalt));
+    p.oat = Math.round(p.oat);
     return p;
 };
 
@@ -752,8 +752,8 @@ e6b.problems.calc.advanced.misc = function () {
  * Unit conversion problems: fuel-weight
  */
 e6b.misc_fuel_weight = function () {
-    var gallons = e6b.rand(5, 150);
-    var lb = e6b.approx(gallons * 6.01);
+    var lb = e6b.rand(30, 900);
+    var gallons = e6b.approx(lb / 6.01 * 10) / 10;
     switch (e6b.rand(0, 2)) {
     case 0:
         return [
