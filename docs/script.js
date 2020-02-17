@@ -78,35 +78,35 @@ e6b.gen_wind_params = function () {
 
     // Randomly-generated values
     params.course = e6b.rand(0, 360);
-    params.true_airspeed = e6b.rand(60, 250);
-    params.wind_dir = e6b.rand(0, 36) * 10;
-    params.wind_speed = e6b.rand(5, 40);
+    params.tas = e6b.rand(60, 250);
+    params.wdir = e6b.rand(0, 36) * 10;
+    params.wspeed = e6b.rand(5, 40);
 
     // Derived values
-    params.headwind = e6b.get_headwind(params.course, params.wind_dir, params.wind_speed);
-    params.crosswind = e6b.get_crosswind(params.course, params.wind_dir, params.wind_speed);
-    params.effective_speed = e6b.get_effective_speed(params.true_airspeed, params.crosswind);
-    params.groundspeed = params.effective_speed - params.headwind;
-    params.wind_correction_angle = e6b.get_wind_correction_angle(params.true_airspeed, params.crosswind);
-    params.heading = (params.course + params.wind_correction_angle + 360) % 360;
+    params.headwind = e6b.get_headwind(params.course, params.wdir, params.wspeed);
+    params.crosswind = e6b.get_crosswind(params.course, params.wdir, params.wspeed);
+    params.espeed = e6b.get_effective_speed(params.tas, params.crosswind);
+    params.gs = params.espeed - params.headwind;
+    params.wca = e6b.get_wind_correction_angle(params.tas, params.crosswind);
+    params.heading = (params.course + params.wca + 360) % 360;
 
     if (params.headwind < 0) {
         params.headwind_dir = "tailwind";
-        params.headwind_op = "add";
+        params.headwind_op = "Add";
         params.headwind_prep = "to";
     } else {
         params.headwind_dir = "headwind";
-        params.headwind_op = "subtract";
+        params.headwind_op = "Subtract";
         params.headwind_prep = "from";
     }
 
     if (params.crosswind < 0) {
         params.crosswind_dir = "left";
-        params.crosswind_op = "subtract";
+        params.crosswind_op = "Subtract";
         params.crosswind_prep = "from";
     } else {
         params.crosswind_dir = "right";
-        params.crosswind_op = "add";
+        params.crosswind_op = "Add";
         params.crosswind_prep = "to";
     }
 
@@ -121,25 +121,18 @@ e6b.problems.wind.basic.heading = function () {
     var params = e6b.gen_wind_params();
     return [
         e6b.fmt("Heading: {{n}} kt true airspeed, course {{n}}°, wind from {{n}}° @ {{n}} kt",
-                params.true_airspeed, params.course, params.wind_dir, params.wind_speed),
+                params.tas, params.course, params.wdir, params.wspeed),
         e6b.fmt("Fly heading {{n}}°", params.heading),
         [
-            e6b.fmt("Set the wind direction, {{n}}, under the \"true index\" or \"TC\" pointer", params.wind_dir),
-            e6b.fmt("Make a pencil mark {{n}} kt straight up from the centre grommet for the wind speed", params.wind_speed),
-            e6b.fmt("Set the course, {{n}}, next to the \"true index\" or \"TC\" pointer", params.course),
-            e6b.fmt("For a classic E6-B with a sliding card: slide until the pencil mark is over the true airspeed " +
-                    "{{n}}, read the wind-correction-angle {{n}} to the {{s}} under the pencil mark, and {{s}} {{s}} " +
-                    "the course {{n}} to get the heading {{n}}",
-                    params.true_airspeed, Math.abs(params.wind_correction_angle), params.crosswind_dir,
-                    params.crosswind_op, params.crosswind_prep, params.course, params.heading),
-            e6b.fmt("For a CR-3/CR-5-style without a sliding card: place the true airspeed, {{n}}, above the \"TAS\" " +
-                    "pointer, read the pencil mark's position {{n}} to the {{s}} on the centre horizontal crosswind scale, " +
-                    "look up the crosswind {{n}} on the outer scale to get the course correction {{n}}° below it, " +
-                    "then {{s}} {{s}} the course {{n}} to get the heading {{n}}",
-                    params.true_airspeed, Math.abs(params.crosswind), params.crosswind_dir,
-                    Math.abs(params.crosswind), Math.abs(params.wind_correction_angle), params.crosswind_op,
-                    params.crosswind_prep, params.course, params.heading)
-        ]                    
+            e6b.fmt("Set the wind direction {{n}}° under the \"true index\" pointer", params.wdir),
+            e6b.fmt("Make a pencil mark for the wind speed {{n}} kt straight up from the centre grommet", params.wspeed),
+            e6b.fmt("Rotate to set the course {{n}}° next to the \"true index\" pointer", params.course),
+            e6b.fmt("Slide the card until the pencil mark is over the true airspeed {{n}} kt", params.tas),
+            e6b.fmt("Read the wind-correction angle {{n}}° to the {{s}} under the pencil mark",
+                    Math.abs(params.wca), params.crosswind_dir),
+            e6b.fmt("{{s}} {{n}} {{s}} the course {{n}}° to get the heading {{n}}°",
+                    params.crosswind_op, Math.abs(params.wca), params.crosswind_prep, params.course, params.heading)
+        ]
     ];
 };
 
@@ -151,25 +144,14 @@ e6b.problems.wind.basic.groundspeed = function () {
     var params = e6b.gen_wind_params();
     return [
         e6b.fmt("Groundspeed (kt): {{n}} kt true airspeed, course {{n}}°, wind from {{n}}° @ {{n}} kt",
-                params.true_airspeed, params.course, params.wind_dir, params.wind_speed),
-        e6b.fmt("{{n}} kt groundspeed", params.groundspeed),
+                params.tas, params.course, params.wdir, params.wspeed),
+        e6b.fmt("{{n}} kt groundspeed", params.gs),
         [
-            e6b.fmt("Set the wind direction, {{n}}, under the \"true index\" or \"TC\" pointer", params.wind_dir),
-            e6b.fmt("Make a pencil mark {{n}} kt straight up from the centre grommet for the wind speed", params.wind_speed),
-            e6b.fmt("Set the course, {{n}}, next to the \"true index\" or \"TC\" pointer", params.course),
-            e6b.fmt("For a classic E6-B with a sliding card: slide until the pencil mark is over the true airspeed " +
-                    "{{n}}, then read the groundspeed {{n}} under the grommet",
-                    params.true_airspeed, params.groundspeed),
-            e6b.fmt("For a CR-3/CR-5-style without a sliding card: place the true airspeed, {{n}}, above the \"TAS\" " +
-                    "pointer, read the pencil mark's position {{n}} relative to the vertical scale to get the " +
-                    "{{s}} component, read the pencil mark's position {{n}} on the {{s}} side of the " +
-                    "horizontal scale to get the crosswind component, look up the crosswind on the outer scale " +
-                    "to get the wind-correction angle {{n}}, adjust the effective speed to {{n}} using the angle and the scale " +
-                    "to the left of the TAS pointer, then {{s}} the {{s}} {{n}} {{s}} the effective airspeed {{n}} " +
-                    "to get the groundspeed {{n}}",
-                    params.true_airspeed, Math.abs(params.headwind), params.headwind_dir, Math.abs(params.crosswind), params.crosswind_dir,
-                    Math.abs(params.wind_correction_angle), params.effective_speed, params.headwind_op, params.headwind_dir, params.headwind,
-                    params.headwind_prep, params.effective_speed, params.groundspeed)
+            e6b.fmt("Rotate to set the wind direction {{n}}° under the \"true index\" pointer", params.wdir),
+            e6b.fmt("Make a pencil mark for the wind speed {{n}} kt straight up from the centre grommet", params.wspeed),
+            e6b.fmt("Rotate to set the course {{n}}° next to the \"true index\" pointer", params.course),
+            e6b.fmt("Slide the card until the pencil mark is over the true airspeed {{n}} kt", params.tas),
+            e6b.fmt("Read the groundspeed {{n}} kt under the centre grommet", params.gs)
         ]
     ];
 };
@@ -182,7 +164,7 @@ e6b.problems.wind.basic.headwind = function () {
     var params = e6b.gen_wind_params();
     return [
         e6b.fmt("Headwind/tailwind (kt): course {{n}}°, wind from {{n}}° @ {{n}} kt",
-                params.course, params.wind_dir, params.wind_speed),
+                params.course, params.wdir, params.wspeed),
         (params.headwind == 0 ? "No headwind"
          : e6b.fmt("{{n}} kt {{s}}", Math.abs(params.headwind), (params.headwind < 0 ? 'tailwind' : 'headwind')))
     ];
@@ -196,8 +178,8 @@ e6b.problems.wind.advanced.wind_aloft = function () {
     var params = e6b.gen_wind_params();
     return [
         e6b.fmt("Wind aloft: {{n}} kt true airspeed, course {{n}}°, heading {{n}}°, {{n}} kt groundspeed",
-                params.true_airspeed, params.course, params.heading, params.groundspeed),
-        e6b.fmt("Wind from {{n}}° @ {{n}} kt", params.wind_dir, params.wind_speed)
+                params.tas, params.course, params.heading, params.gs),
+        e6b.fmt("Wind from {{n}}° @ {{n}} kt", params.wdir, params.wspeed)
     ];
 };
 
@@ -209,7 +191,7 @@ e6b.problems.wind.advanced.course = function () {
     var params = e6b.gen_wind_params();
     return [
         e6b.fmt("Course over the ground: heading {{n}}°, {{n}} kt groundspeed, wind from {{n}}° @ {{n}} kt",
-                params.heading, params.groundspeed, params.wind_dir, params.wind_speed),
+                params.heading, params.gs, params.wdir, params.wspeed),
         e6b.fmt("Course {{n}}°", params.course)
     ];
 }
@@ -222,8 +204,8 @@ e6b.problems.wind.advanced.true_airspeed = function () {
     var params = e6b.gen_wind_params();
     return [
         e6b.fmt("True airspeed (kt): course {{n}}°, {{n}} kt groundspeed, wind from {{n}}° @ {{n}} kt",
-                params.course, params.groundspeed, params.wind_dir, params.wind_speed),
-        e6b.fmt("{{n}} kt true airspeed", params.true_airspeed)
+                params.course, params.gs, params.wdir, params.wspeed),
+        e6b.fmt("{{n}} kt true airspeed", params.tas)
     ];
 };
 
@@ -387,7 +369,7 @@ e6b.gen_density_alt = function () {
     params.oat = 15 - (params.palt * 1.98 / 1000) + oat_offset;
     params.dalt = e6b.density_altitude(params.palt, params.oat);
     params.cas = e6b.rand(70, 250);
-    params.true_airspeed = e6b.approx(e6b.true_airspeed(params.cas, params.dalt));
+    params.tas = e6b.approx(e6b.true_airspeed(params.cas, params.dalt));
     params.oat = e6b.approx(params.oat);
     return params;
 };
@@ -420,12 +402,12 @@ e6b.problems.calc.advanced.true_airspeed = function () {
     return [
         e6b.fmt("True airspeed (kt): {{n}} kt calibrated airspeed, {{n}} ft pressure altitude, {{n}}°C outside air temperature",
                 params.cas, params.palt, params.oat),
-        e6b.fmt("{{n}} kt true airspeed", params.true_airspeed),
+        e6b.fmt("{{n}} kt true airspeed", params.tas),
         [
             e6b.fmt("In the True Airspeed window, line up {{n}} (thousand) pressure altitude with {{n}}°C",
                     params.palt / 1000, params.oat),
             e6b.fmt("Find the calibrated airspeed {{n}} on the inner scale of the main circle", params.cas),
-            e6b.fmt("Read the true airspeed {{n}} on the outer scale above {{n}}", params.true_airspeed, params.cas)
+            e6b.fmt("Read the true airspeed {{n}} on the outer scale above {{n}}", params.tas, params.cas)
         ]
     ];
 };
@@ -916,7 +898,7 @@ e6b.show_problem = function () {
         for (i in steps) {
             var node = document.createElement("li");
             node.textContent = steps[i];
-            e6b.nodes.help.appendChild(node);
+            e6b.nodes.help_steps.appendChild(node);
         }
     }
     
@@ -938,11 +920,14 @@ e6b.show_problem = function () {
     e6b.nodes.answer.hidden = true;
     e6b.nodes.question.textContent = info[0];
     e6b.nodes.answer.textContent = info[1];
-
-    e6b.nodes.help.innerHTML = "";
     e6b.nodes.help.hidden = true;
+
+    e6b.nodes.help_steps.innerHTML = "";
     if (info.length > 2) {
+        e6b.show_help = true;
         setup_help(info[2]);
+    } else {
+        e6b.show_help = false;
     }
 };
 
@@ -953,7 +938,7 @@ e6b.show_problem = function () {
 e6b.input = function (event) {
     if (e6b.nodes.answer.hidden) {
         e6b.nodes.answer.hidden = false;
-        e6b.nodes.help.hidden = false;
+        e6b.nodes.help.hidden = !e6b.show_help;
     } else {
         e6b.show_problem();
     }
@@ -1012,6 +997,7 @@ window.addEventListener('load', function () {
     e6b.nodes.question = document.getElementById("question");
     e6b.nodes.answer = document.getElementById("answer");
     e6b.nodes.help = document.getElementById("help");
+    e6b.nodes.help_steps = document.getElementById("help-steps");
 
     // Setup basic/advanced toggle
     e6b.setup_advanced();
