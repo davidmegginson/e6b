@@ -262,7 +262,7 @@ e6b.gen_dst_params = function () {
     var p = {};
     p.speed = e6b.rand(60, 300);
     p.time = e6b.rand(5, 180);
-    p.dist = Math.round(p.speed / 60.0 * p.time);
+    p.dist = Math.round((p.speed / 60.0) * p.time);
     return p;
 };
 
@@ -488,7 +488,7 @@ e6b.problems.calc.advanced.true_altitude = function () {
 e6b.problems.calc.advanced.vertical_speed = function () {
     var fpm = e6b.rand(300, 1200);
     var gs = e6b.rand(50, 150);
-    var fpnm = e6b.approx(fpm * 60 / gs);
+    var fpnm = Math.round(fpm * 60 / gs);
     switch (e6b.rand(0, 2)) {
     case 0:
         return [
