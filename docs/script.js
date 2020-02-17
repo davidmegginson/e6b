@@ -471,7 +471,7 @@ e6b.problems.calc.advanced.true_altitude = function () {
             e6b.fmt("Subtract {{n}} ft station elevation from {{n}} ft indicated altitude to get {{n}} ft indicated altitude above station",
                     station_elev, indicated_alt, indicated_alt - station_elev),
             e6b.fmt("In the True Altitude window, line up {{n}} (thousand feet) pressure altitude with {{n}}°C",
-                    e6b.round(pressure_alt / 1000), oat),
+                    Math.round(pressure_alt / 1000), oat),
             e6b.fmt("Find indicated altitude above station {{n}} ft on the main inner scale", indicated_alt - station_elev),
             e6b.fmt("Read approximate true altitude above station {{n}} ft on the outer scale above {{n}}",
                     e6b.approx(true_alt - station_elev), indicated_alt - station_elev),
