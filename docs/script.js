@@ -74,43 +74,43 @@ e6b.get_wind_correction_angle = function (true_airspeed, crosswind) {
  * Generate random parameters for a wind problem.
  */
 e6b.gen_wind_params = function () {
-    var params = {};
+    var p = {};
 
     // Randomly-generated values
-    params.course = e6b.rand(0, 360);
-    params.tas = e6b.rand(60, 180);
-    params.wdir = e6b.rand(0, 36) * 10;
-    params.wspeed = e6b.rand(5, 40);
+    p.course = e6b.rand(0, 360);
+    p.tas = e6b.rand(60, 180);
+    p.wdir = e6b.rand(0, 36) * 10;
+    p.wspeed = e6b.rand(5, 40);
 
     // Derived values
-    params.headwind = e6b.get_headwind(params.course, params.wdir, params.wspeed);
-    params.crosswind = e6b.get_crosswind(params.course, params.wdir, params.wspeed);
-    params.espeed = e6b.get_effective_speed(params.tas, params.crosswind);
-    params.gs = params.espeed - params.headwind;
-    params.wca = e6b.get_wind_correction_angle(params.tas, params.crosswind);
-    params.heading = (params.course + params.wca + 360) % 360;
+    p.headwind = e6b.get_headwind(p.course, p.wdir, p.wspeed);
+    p.crosswind = e6b.get_crosswind(p.course, p.wdir, p.wspeed);
+    p.espeed = e6b.get_effective_speed(p.tas, p.crosswind);
+    p.gs = p.espeed - p.headwind;
+    p.wca = e6b.get_wind_correction_angle(p.tas, p.crosswind);
+    p.heading = (p.course + p.wca + 360) % 360;
 
-    if (params.headwind < 0) {
-        params.headwind_dir = "tailwind";
-        params.headwind_op = "Add";
-        params.headwind_prep = "to";
+    if (p.headwind < 0) {
+        p.headwind_dir = "tailwind";
+        p.headwind_op = "Add";
+        p.headwind_prep = "to";
     } else {
-        params.headwind_dir = "headwind";
-        params.headwind_op = "Subtract";
-        params.headwind_prep = "from";
+        p.headwind_dir = "headwind";
+        p.headwind_op = "Subtract";
+        p.headwind_prep = "from";
     }
 
-    if (params.crosswind < 0) {
-        params.crosswind_dir = "left";
-        params.crosswind_op = "Subtract";
-        params.crosswind_prep = "from";
+    if (p.crosswind < 0) {
+        p.crosswind_dir = "left";
+        p.crosswind_op = "Subtract";
+        p.crosswind_prep = "from";
     } else {
-        params.crosswind_dir = "right";
-        params.crosswind_op = "Add";
-        params.crosswind_prep = "to";
+        p.crosswind_dir = "right";
+        p.crosswind_op = "Add";
+        p.crosswind_prep = "to";
     }
 
-    return params;
+    return p;
 };
 
 
@@ -118,20 +118,20 @@ e6b.gen_wind_params = function () {
  * Wind problem: calculate heading corrected for wind.
  */
 e6b.problems.wind.basic.heading = function () {
-    var params = e6b.gen_wind_params();
+    var p = e6b.gen_wind_params();
     return [
-        e6b.fmt("Heading: {{n}} kt true airspeed, course {{n}}°, wind from {{n}}° @ {{n}} kt",
-                params.tas, params.course, params.wdir, params.wspeed),
-        e6b.fmt("Fly heading {{n}}°", params.heading),
+        e6b.fmt("Heading: {{n}} kt true airspeed, course {{n}}°, wind from {{n}}° @ {{n}} kt",
+                p.tas, p.course, p.wdir, p.wspeed),
+        e6b.fmt("Fly heading {{n}}°", p.heading),
         [
-            e6b.fmt("Set the wind direction {{n}}° under the \"true index\" pointer", params.wdir),
-            e6b.fmt("Make a pencil mark for the wind speed {{n}} kt straight up from the centre grommet", params.wspeed),
-            e6b.fmt("Rotate to set the course {{n}}° next to the \"true index\" pointer", params.course),
-            e6b.fmt("Slide the card until the pencil mark is over the true airspeed {{n}} kt", params.tas),
+            e6b.fmt("Set the wind direction {{n}}° under the \"true index\" pointer", p.wdir),
+            e6b.fmt("Make a pencil mark for the wind speed {{n}} kt straight up from the centre grommet", p.wspeed),
+            e6b.fmt("Rotate to set the course {{n}}° next to the \"true index\" pointer", p.course),
+            e6b.fmt("Slide the card until the pencil mark is over the true airspeed {{n}} kt", p.tas),
             e6b.fmt("Read the wind-correction angle {{n}}° to the {{s}} under the pencil mark",
-                    Math.abs(params.wca), params.crosswind_dir),
+                    Math.abs(p.wca), p.crosswind_dir),
             e6b.fmt("{{s}} {{n}} {{s}} the course {{n}}° to get the heading {{n}}°",
-                    params.crosswind_op, Math.abs(params.wca), params.crosswind_prep, params.course, params.heading)
+                    p.crosswind_op, Math.abs(p.wca), p.crosswind_prep, p.course, p.heading)
         ]
     ];
 };
@@ -141,17 +141,17 @@ e6b.problems.wind.basic.heading = function () {
  * Wind problem: calculate groundspeed.
  */
 e6b.problems.wind.basic.groundspeed = function () {
-    var params = e6b.gen_wind_params();
+    var p = e6b.gen_wind_params();
     return [
-        e6b.fmt("Groundspeed (kt): {{n}} kt true airspeed, course {{n}}°, wind from {{n}}° @ {{n}} kt",
-                params.tas, params.course, params.wdir, params.wspeed),
-        e6b.fmt("{{n}} kt groundspeed", params.gs),
+        e6b.fmt("Groundspeed (kt): {{n}} kt true airspeed, course {{n}}°, wind from {{n}}° @ {{n}} kt",
+                p.tas, p.course, p.wdir, p.wspeed),
+        e6b.fmt("{{n}} kt groundspeed", p.gs),
         [
-            e6b.fmt("Rotate to set the wind direction {{n}}° under the \"true index\" pointer", params.wdir),
-            e6b.fmt("Make a pencil mark for the wind speed {{n}} kt straight up from the centre grommet", params.wspeed),
-            e6b.fmt("Rotate to set the course {{n}}° next to the \"true index\" pointer", params.course),
-            e6b.fmt("Slide the card until the pencil mark is over the true airspeed {{n}} kt", params.tas),
-            e6b.fmt("Read the groundspeed {{n}} kt under the centre grommet", params.gs)
+            e6b.fmt("Rotate to set the wind direction {{n}}° under the \"true index\" pointer", p.wdir),
+            e6b.fmt("Make a pencil mark for the wind speed {{n}} kt straight up from the centre grommet", p.wspeed),
+            e6b.fmt("Rotate to set the course {{n}}° next to the \"true index\" pointer", p.course),
+            e6b.fmt("Slide the card until the pencil mark is over the true airspeed {{n}} kt", p.tas),
+            e6b.fmt("Read the groundspeed {{n}} kt under the centre grommet", p.gs)
         ]
     ];
 };
@@ -161,22 +161,22 @@ e6b.problems.wind.basic.groundspeed = function () {
  * Wind problem: calculate wind aloft.
  */
 e6b.problems.wind.advanced.wind_aloft = function () {
-    var params = e6b.gen_wind_params();
+    var p = e6b.gen_wind_params();
     return [
-        e6b.fmt("Wind aloft: {{n}} kt true airspeed, course {{n}}°, heading {{n}}°, {{n}} kt groundspeed",
-                params.tas, params.course, params.heading, params.gs),
-        e6b.fmt("Wind from {{n}}° @ {{n}} kt", params.wdir, params.wspeed),
+        e6b.fmt("Wind aloft: {{n}} kt true airspeed, course {{n}}°, heading {{n}}°, {{n}} kt groundspeed",
+                p.tas, p.course, p.heading, p.gs),
+        e6b.fmt("Wind from {{n}}° @ {{n}} kt", p.wdir, p.wspeed),
         [
-            e6b.fmt("Rotate to set the course {{n}}° under the \"true index\" pointer", params.course),
-            e6b.fmt("Slide the card until the centre grommet is over the groundspeed {{n}} kt", params.gs),
+            e6b.fmt("Rotate to set the course {{n}}° under the \"true index\" pointer", p.course),
+            e6b.fmt("Slide the card until the centre grommet is over the groundspeed {{n}} kt", p.gs),
             e6b.fmt("Compare the course {{n}}° to the actual heading {{n}}° to get a wind-correction " +
-                    "angle of {{n}}° to the {{s}}", params.course, params.heading, Math.abs(params.wca), params.crosswind_dir),
+                    "angle of {{n}}° to the {{s}}", p.course, p.heading, Math.abs(p.wca), p.crosswind_dir),
             e6b.fmt("Make a pencil mark where the {{n}}° wind-correction angle on the {{s}} side crosses the " +
-                    "{{n}} kt true airspeed line", Math.abs(params.wca), params.crosswind_dir, params.tas),
+                    "{{n}} kt true airspeed line", Math.abs(p.wca), p.crosswind_dir, p.tas),
             "Rotate so that the pencil mark is on the vertical line above the grommet",
-            e6b.fmt("The wind direction, {{n}}°, is under the \"true index\" pointer", params.wdir),
-            e6b.fmt("The wind speed, {{n}} kt, is the number of knots between the grommet and the pencil mark",
-                    params.wspeed)
+            e6b.fmt("The wind direction, {{n}}°, is under the \"true index\" pointer", p.wdir),
+            e6b.fmt("The wind speed, {{n}} kt, is the number of knots between the grommet and the pencil mark",
+                    p.wspeed)
         ]
     ];
 };
@@ -185,18 +185,18 @@ e6b.problems.wind.advanced.wind_aloft = function () {
 /**
  * Calculate parameters for runway-wind problems.
  */
-e6b.runway_wind_info = function () {
-    var params = {};
-    params.runway = e6b.rand(0, 36) + 1;
-    params.course = params.runway * 10;
-    params.wind_dir = (params.course + e6b.rand(-90, 90) + 360) % 360;
-    params.wind_speed = e6b.rand(5, 30);
-    params.headwind = e6b.get_headwind(params.course, params.wind_dir, params.wind_speed);
-    params.headwind_dir = (params.headwind < 0 ? "tailwind" : "headwind");
-    params.crosswind = e6b.get_crosswind(params.course, params.wind_dir, params.wind_speed);
-    params.crosswind_dir = (params.crosswind < 0 ? "left" : "right");
-    params.wind_angle = params.wind_dir - params.course;
-    return params;
+e6b.runway_wind_params = function () {
+    var p = {};
+    p.runway = e6b.rand(0, 36) + 1;
+    p.course = p.runway * 10;
+    p.wind_dir = (p.course + e6b.rand(-90, 90) + 360) % 360;
+    p.wind_speed = e6b.rand(5, 30);
+    p.headwind = e6b.get_headwind(p.course, p.wind_dir, p.wind_speed);
+    p.headwind_dir = (p.headwind < 0 ? "tailwind" : "headwind");
+    p.crosswind = e6b.get_crosswind(p.course, p.wind_dir, p.wind_speed);
+    p.crosswind_dir = (p.crosswind < 0 ? "left" : "right");
+    p.wind_angle = p.wind_dir - p.course;
+    return p;
 };
 
 
@@ -204,21 +204,21 @@ e6b.runway_wind_info = function () {
  * Wind problem: calculate the runway headwind for landing/takeoff.
  */
 e6b.problems.wind.advanced.runway_headwind = function () {
-    var params = e6b.runway_wind_info();
+    var p = e6b.runway_wind_params();
     return [
-        e6b.fmt("Headwind: Runway {{n}}, wind from {{n}}° @ {{n}} kt",
-                params.runway, params.wind_dir, params.wind_speed),
-        (params.headwind == 0 ? "No headwind"
-         : e6b.fmt("{{n}} kt {{s}}", Math.abs(params.headwind), params.headwind_dir)),
+        e6b.fmt("Headwind: Runway {{n}}, wind from {{n}}° @ {{n}} kt",
+                p.runway, p.wind_dir, p.wind_speed),
+        (p.headwind == 0 ? "No headwind"
+         : e6b.fmt("{{n}} kt {{s}}", Math.abs(p.headwind), p.headwind_dir)),
         [
             e6b.fmt("Compare the runway heading {{n}}° and the wind direction {{n}}° to get " +
                     "a wind angle of {{n}}° from the {{s}} side of the runway",
-                    params.course, params.wind_dir, Math.abs(params.wind_angle), params.crosswind_dir),
+                    p.course, p.wind_dir, Math.abs(p.wind_angle), p.crosswind_dir),
             e6b.fmt("Using the wind-component grid on the card part of the E6B, " +
-                    "trace approximately a {{n}}° angle line until it intersects with a {{n}} kt curve",
-                    Math.abs(params.wind_angle), params.wind_speed),
-            e6b.fmt("Look directly left and read approximately {{n}} kt on the \"Headwind component\" axis",
-                    Math.abs(params.headwind))
+                    "trace approximately a {{n}}° angle line until it intersects with a {{n}} kt curve",
+                    Math.abs(p.wind_angle), p.wind_speed),
+            e6b.fmt("Look directly left and read approximately {{n}} kt on the \"Headwind component\" axis",
+                    Math.abs(p.headwind))
         ]
     ];
 };
@@ -228,22 +228,22 @@ e6b.problems.wind.advanced.runway_headwind = function () {
  * Wind problem: calculate the runway crosswind for landing.
  */
 e6b.problems.wind.advanced.runway_crosswind = function () {
-    var params = e6b.runway_wind_info();
+    var p = e6b.runway_wind_params();
     return [
-        e6b.fmt("Crosswind: Runway {{n}}, wind from {{n}}° @ {{n}} kt",
-                params.runway, params.wind_dir, params.wind_speed),
-        (params.crosswind == 0 ? "No crosswind"
-         : e6b.fmt("{{n}} kt crosswind from the {{s}} side of the runway",
-                   Math.abs(params.crosswind), params.crosswind_dir)),
+        e6b.fmt("Crosswind: Runway {{n}}, wind from {{n}}° @ {{n}} kt",
+                p.runway, p.wind_dir, p.wind_speed),
+        (p.crosswind == 0 ? "No crosswind"
+         : e6b.fmt("{{n}} kt crosswind from the {{s}} side of the runway",
+                   Math.abs(p.crosswind), p.crosswind_dir)),
         [
             e6b.fmt("Compare the runway heading {{n}}° and the wind direction {{n}}° to get " +
                     "a wind angle of {{n}}° to the {{s}}",
-                    params.course, params.wind_dir, Math.abs(params.wind_angle), params.crosswind_dir),
+                    p.course, p.wind_dir, Math.abs(p.wind_angle), p.crosswind_dir),
             e6b.fmt("Using the wind-component grid on the card part of the E6B, " +
-                    "trace approximately a {{n}}° angle line until it intersects with a {{n}} kt curve",
-                    Math.abs(params.wind_angle), params.wind_speed),
-            e6b.fmt("Look directly down and read approximately {{n}} kt on the \"Crosswind component\" axis",
-                    Math.abs(params.crosswind))
+                    "trace approximately a {{n}}° angle line until it intersects with a {{n}} kt curve",
+                    Math.abs(p.wind_angle), p.wind_speed),
+            e6b.fmt("Look directly down and read approximately {{n}} kt on the \"Crosswind component\" axis",
+                    Math.abs(p.crosswind))
         ]             
     ];
 };
@@ -259,11 +259,11 @@ e6b.problems.wind.advanced.runway_crosswind = function () {
  * Generate random parameters for a distance/speed/time problem.
  */
 e6b.gen_dst_params = function () {
-    var params = {};
-    params.speed = e6b.rand(60, 300);
-    params.time = e6b.rand(5, 180);
-    params.dist = Math.round(params.speed / 60.0 * params.time);
-    return params;
+    var p = {};
+    p.speed = e6b.rand(60, 300);
+    p.time = e6b.rand(5, 180);
+    p.dist = Math.round(p.speed / 60.0 * p.time);
+    return p;
 };
 
 
@@ -271,14 +271,14 @@ e6b.gen_dst_params = function () {
  * Calculator problem: speed from distance and time
  */
 e6b.problems.calc.basic.speed = function () {
-    var params = e6b.gen_dst_params();
+    var p = e6b.gen_dst_params();
     return [
-        e6b.fmt("Groundspeed: travelled {{n}} nm in {{t}}", params.dist, params.time),
-        e6b.fmt("{{n}} kt groundspeed", params.speed),
+        e6b.fmt("Groundspeed (knots): travelled {{n}} nm in {{t}}", p.dist, p.time),
+        e6b.fmt("{{n}} kt groundspeed", p.speed),
         [
-            e6b.fmt("Find the distance {{n}} on the outer scale", params.dist),
-            e6b.fmt("Rotate until the time {{n}} ({{t}}) on the inner scale is underneath {{n}}", params.time, params.time, params.dist),
-            e6b.fmt("Read the speed {{n}} on the outer scale above the rate pointer (60)", params.speed)
+            e6b.fmt("Find the distance {{n}} nm on the outer scale", p.dist),
+            e6b.fmt("Rotate until the time {{t}} on the inner scale is underneath {{n}}", p.time, p.dist),
+            e6b.fmt("Read the speed {{n}} kt on the outer scale above the rate pointer (60)", p.speed)
         ]
     ];
 };
@@ -288,14 +288,14 @@ e6b.problems.calc.basic.speed = function () {
  * Calculator problem: time from speed and distance
  */
 e6b.problems.calc.basic.time = function () {
-    var params = e6b.gen_dst_params();
+    var p = e6b.gen_dst_params();
     return [
-        e6b.fmt("Time enroute: {{n}} nm at {{n}} kt", params.dist, params.speed),
-        e6b.fmt("{{t}} ETE", params.time),
+        e6b.fmt("Time enroute: travelling {{n}} nm at {{n}} kt", p.dist, p.speed),
+        e6b.fmt("{{t}} enroute", p.time),
         [
-            e6b.fmt("Rotate until the airspeed, {{n}}, appears on the outer scale above the rate pointer (60)", params.speed),
-            e6b.fmt("Find the distance {{n}} on the outer scale", params.dist),
-            e6b.fmt("Read the time {{n}} ({{t}}) on the inner scale below {{n}}", params.time, params.time, params.dist)
+            e6b.fmt("Rotate until the airspeed {{n}} kt appears on the outer scale above the rate pointer (60)", p.speed),
+            e6b.fmt("Find the distance {{n}} nm on the outer scale", p.dist),
+            e6b.fmt("Read the time {{t}} on the inner scale below {{n}}", p.time, p.dist)
         ]
     ];
 };
@@ -305,14 +305,14 @@ e6b.problems.calc.basic.time = function () {
  * Calculator problem: distance from speed and time
  */
 e6b.problems.calc.basic.dist = function () {
-    var params = e6b.gen_dst_params();
+    var p = e6b.gen_dst_params();
     return [
-        e6b.fmt("Distance travelled: flying for {{t}} at {{n}} kt", params.time, params.speed),
-        e6b.fmt("{{n}} kt travelled", params.dist),
+        e6b.fmt("Distance travelled: flying for {{t}} at {{n}} kt", p.time, p.speed),
+        e6b.fmt("{{n}} kt travelled", p.dist),
         [
-            e6b.fmt("Rotate until the speed, {{n}}, appears above the rate pointer (60)", params.speed),
-            e6b.fmt("Find the time {{n}} ({{t}}) on the inner scale", params.time, params.time),
-            e6b.fmt("Read the distance {{n}} on the outer scale above {{n}}", params.dist, params.time)
+            e6b.fmt("Rotate until the speed {{n}} kt appears above the rate pointer (60)", p.speed),
+            e6b.fmt("Find the time {{t}} on the inner scale", p.time),
+            e6b.fmt("Read the distance {{n}} nm on the outer scale above {{t}}", p.dist, p.time)
         ]
     ];
 };
@@ -322,27 +322,26 @@ e6b.problems.calc.basic.dist = function () {
  * Generate random parameters for a burn/endurance/fuel problem.
  */
 e6b.gen_bef_params = function () {
-    var params = {};
-    params.burn = e6b.rand(50, 300) / 10.0; // one decimal place
-    params.endurance = e6b.rand(5, 180);
-    params.fuel = Math.round((params.burn / 60) * params.endurance);
-    return params;
+    var p = {};
+    p.gph = e6b.rand(50, 300) / 10.0; // one decimal place
+    p.endurance = e6b.rand(5, 180);
+    p.fuel = Math.round((p.gph / 60) * p.endurance);
+    return p;
 };
 
 
 /**
  * Calculator problem: fuel burn from fuel and endurance.
  */
-e6b.problems.calc.basic.burn = function () {
-    params = e6b.gen_bef_params();
+e6b.problems.calc.basic.gph = function () {
+    var p = e6b.gen_bef_params();
     return [
-        e6b.fmt("Fuel-consumption rate (gph): used {{n}} gal in {{t}}", params.fuel, params.endurance),
-        e6b.fmt("{{n}} gph", params.burn),
+        e6b.fmt("Fuel-consumption rate (gph): used {{n}} gallons in {{t}}", p.fuel, p.endurance),
+        e6b.fmt("Consuming {{n}} gph", p.gph),
         [
-            e6b.fmt("Find the fuel used, {{n}}, on the outer scale", params.fuel),
-            e6b.fmt("Rotate until the time {{n}} ({{t}}) appears on the inner scale below {{n}}",
-                    params.endurance, params.endurance, params.fuel),
-            e6b.fmt("Read the fuel consumption {{n}} above the rate pointer (60)", params.burn)
+            e6b.fmt("Find {{n}} gallons on the outer scale", p.fuel),
+            e6b.fmt("Rotate until the time {{t}} appears on the inner scale below {{n}}", p.endurance, p.fuel),
+            e6b.fmt("Read the fuel consumption {{n}} gph above the rate pointer (60)", p.gph)
         ]
     ];
 };
@@ -352,14 +351,14 @@ e6b.problems.calc.basic.burn = function () {
  * Calculator problem: fuel from fuel burn and endurance.
  */
 e6b.problems.calc.basic.fuel = function () {
-    params = e6b.gen_bef_params();
+    var p = e6b.gen_bef_params();
     return [
-        e6b.fmt("Fuel required (US gallons): flying for {{t}}, consuming {{n}} gph", params.endurance, params.burn),
-        e6b.fmt("{{n}} US gallons required", params.fuel),
+        e6b.fmt("Fuel required (gallons): flying for {{t}}, consuming {{n}} gph", p.endurance, p.gph),
+        e6b.fmt("{{n}} gallons required", p.fuel),
         [
-            e6b.fmt("Rotate until the fuel consumption, {{n}}, appears above the rate pointer (60)", params.burn),
-            e6b.fmt("Find the endurance {{n}} ({{t}}) on the inner scale", params.endurance, params.endurance),
-            e6b.fmt("Read the fuel needed, {{n}}, on the outer scale above {{n}}", params.fuel, params.endurance)
+            e6b.fmt("Rotate until the fuel consumption {{n}} gph appears above the rate pointer (60)", p.gph),
+            e6b.fmt("Find the endurance {{t}} on the inner scale", p.endurance),
+            e6b.fmt("Read {{n}} gallons fuel required on the outer scale above {{t}}", p.fuel, p.endurance)
         ]
     ];
 };
@@ -369,14 +368,14 @@ e6b.problems.calc.basic.fuel = function () {
  * Calculator problem: endurance from fuel and fuel burn.
  */
 e6b.problems.calc.basic.endurance = function () {
-    var params = e6b.gen_bef_params();
+    var p = e6b.gen_bef_params();
     return [
-        e6b.fmt("Endurance: {{n}} gal fuel onboard, consuming {{n}} gph", params.fuel, params.burn),
-        e6b.fmt("{{t}} endurance", params.endurance),
+        e6b.fmt("Endurance: {{n}} gallons fuel onboard, consuming {{n}} gph", p.fuel, p.gph),
+        e6b.fmt("{{t}} endurance", p.endurance),
         [
-            e6b.fmt("Rotate until the fuel consumption, {{n}}, appears above the rate pointer (60)", params.burn),
-            e6b.fmt("Find the fuel available, {{n}}, on the outer scale", params.fuel),
-            e6b.fmt("Read the endurance {{n}} ({{t}}) on the inner scale below {{n}}", params.endurance, params.endurance, params.fuel)
+            e6b.fmt("Rotate until the fuel consumption {{n}} gph appears above the rate pointer (60)", p.gph),
+            e6b.fmt("Find the fuel available {{n}} gallons on the outer scale", p.fuel),
+            e6b.fmt("Read the endurance {{n}} ({{t}}) on the inner scale below {{n}}", p.endurance, p.endurance, p.fuel)
         ]
     ];
 };
@@ -387,15 +386,15 @@ e6b.problems.calc.basic.endurance = function () {
  */
 e6b.gen_density_alt = function () {
     // FIXME - not the real formulas
-    var params = {};
+    var p = {};
     var oat_offset = e6b.rand(20, -20);
-    params.palt = e6b.rand(1, 18) * 1000;
-    params.oat = 15 - (params.palt * 1.98 / 1000) + oat_offset;
-    params.dalt = e6b.density_altitude(params.palt, params.oat);
-    params.cas = e6b.rand(70, 250);
-    params.tas = e6b.approx(e6b.true_airspeed(params.cas, params.dalt));
-    params.oat = e6b.approx(params.oat);
-    return params;
+    p.palt = e6b.rand(1, 18) * 1000;
+    p.oat = 15 - (p.palt * 1.98 / 1000) + oat_offset;
+    p.dalt = e6b.density_altitude(p.palt, p.oat);
+    p.cas = e6b.rand(70, 250);
+    p.tas = e6b.approx(e6b.true_airspeed(p.cas, p.dalt));
+    p.oat = e6b.approx(p.oat);
+    return p;
 };
 
 
@@ -403,16 +402,16 @@ e6b.gen_density_alt = function () {
  * Calculator problem: density altitude from pressure altitude and OAT.
  */
 e6b.problems.calc.advanced.density_alt = function () {
-    var params = e6b.gen_density_alt();
+    var p = e6b.gen_density_alt();
     return [
-        e6b.fmt("Density altitude: {{n}} ft pressure altitude, {{n}}°c outside air temperature",
-                params.palt, params.oat),
-        e6b.fmt("{{n}} ft density altitude", e6b.approx(params.dalt)),
+        e6b.fmt("Density altitude: {{n}} ft pressure altitude, {{n}}°c outside air temperature",
+                p.palt, p.oat),
+        e6b.fmt("{{n}} ft density altitude", e6b.approx(p.dalt)),
         [
-            e6b.fmt("In the bottom section of the True Airspeed window, line up {{n}} (thousand) pressure altitude with {{n}}°C",
-                    params.palt / 1000, params.oat),
-            e6b.fmt("In the top section, read {{n}} (thousand) under the Density Altitude pointer",
-                    e6b.approx(params.dalt))
+            e6b.fmt("In the bottom section of the True Airspeed window, line up {{n}} (thousand feet) pressure altitude with {{n}}°C",
+                    Math.round(p.palt / 1000), p.oat),
+            e6b.fmt("In the top section, read {{n}} (thousand feet) under the Density Altitude pointer",
+                    e6b.approx(p.dalt))
         ]
     ];
 };
@@ -422,16 +421,16 @@ e6b.problems.calc.advanced.density_alt = function () {
  * Calculator problem: TAS from CAS, pressure altitude, and OAT
  */
 e6b.problems.calc.advanced.true_airspeed = function () {
-    var params = e6b.gen_density_alt();
+    var p = e6b.gen_density_alt();
     return [
-        e6b.fmt("True airspeed (kt): {{n}} kt calibrated airspeed, {{n}} ft pressure altitude, {{n}}°C outside air temperature",
-                params.cas, params.palt, params.oat),
-        e6b.fmt("{{n}} kt true airspeed", params.tas),
+        e6b.fmt("True airspeed (knots): {{n}} kt calibrated airspeed, {{n}} ft pressure altitude, {{n}}°C outside air temperature",
+                p.cas, p.palt, p.oat),
+        e6b.fmt("{{n}} kt true airspeed", p.tas),
         [
-            e6b.fmt("In the True Airspeed window, line up {{n}} (thousand) pressure altitude with {{n}}°C",
-                    params.palt / 1000, params.oat),
-            e6b.fmt("Find the calibrated airspeed {{n}} on the inner scale of the main circle", params.cas),
-            e6b.fmt("Read the true airspeed {{n}} on the outer scale above {{n}}", params.tas, params.cas)
+            e6b.fmt("In the True Airspeed window, line up {{n}} (thousand feet) pressure altitude with {{n}}°C",
+                    Math.round(p.palt / 1000), p.oat),
+            e6b.fmt("Find the calibrated airspeed {{n}} kt on the inner scale of the main circle", p.cas),
+            e6b.fmt("Read the true airspeed {{n}} kt on the outer scale above {{n}}", p.tas, p.cas)
         ]
     ];
 };
@@ -465,19 +464,19 @@ e6b.problems.calc.advanced.true_altitude = function () {
     var true_alt = e6b.approx(indicated_alt + ((indicated_alt - station_elev) / 1000 * delta_temp * 4));
 
     return [
-        e6b.fmt("True altitude: {{n}} ft indicated altitude, {{n}}°C OAT, {{n}} ft pressure altitude, {{n}} ft MSL station elevation",
+        e6b.fmt("True altitude: {{n}} ft indicated altitude, {{n}}°C OAT, {{n}} ft pressure altitude, {{n}} ft MSL station elevation",
                 indicated_alt, oat, pressure_alt, station_elev),
-        e6b.fmt("{{n}} ft true altitude", true_alt),
+        e6b.fmt("{{n}} ft true altitude", true_alt),
         [
-            e6b.fmt("Subtract {{n}} station elevation from {{n}} indicated altitude to get {{n}} (indicated altitude above station)",
+            e6b.fmt("Subtract {{n}} ft station elevation from {{n}} ft indicated altitude to get {{n}} ft indicated altitude above station",
                     station_elev, indicated_alt, indicated_alt - station_elev),
-            e6b.fmt("In the True Altitude window, line up {{n}} (thousand) pressure altitude with {{n}}°C",
-                    e6b.approx(pressure_alt) / 1000, oat),
-            e6b.fmt("Find the altitude difference, {{n}}, on the main inner scale", indicated_alt - station_elev),
-            e6b.fmt("Read true altitude above station, {{n}}, on the outer scale above {{n}}",
-                    true_alt - station_elev, indicated_alt - station_elev),
-            e6b.fmt("Add {{n}} to the station elevation {{n}} to get the absolute true altitude, {{n}}",
-                    true_alt - station_elev, station_elev, true_alt)
+            e6b.fmt("In the True Altitude window, line up {{n}} (thousand feet) pressure altitude with {{n}}°C",
+                    e6b.round(pressure_alt / 1000), oat),
+            e6b.fmt("Find indicated altitude above station {{n}} ft on the main inner scale", indicated_alt - station_elev),
+            e6b.fmt("Read approximate true altitude above station {{n}} ft on the outer scale above {{n}}",
+                    e6b.approx(true_alt - station_elev), indicated_alt - station_elev),
+            e6b.fmt("Add {{n}} to the station elevation {{n}} to get the approximate true altitude, {{n}}",
+                    e6b.approx(true_alt - station_elev), station_elev, true_alt)
         ]
     ];
 };
@@ -493,22 +492,22 @@ e6b.problems.calc.advanced.vertical_speed = function () {
     switch (e6b.rand(0, 2)) {
     case 0:
         return [
-            e6b.fmt("Climb gradiant (ft/nm): {{n}} kt groundspeed, {{n}} fpm climb rate", gs, fpm),
-            e6b.fmt("{{n}} ft/nm climb gradiant", fpnm),
+            e6b.fmt("Climb gradiant (ft/nm): {{n}} kt groundspeed, {{n}} fpm climb rate", gs, fpm),
+            e6b.fmt("{{n}} ft/nm climb gradiant", fpnm),
             [
-                e6b.fmt("Rotate until the groundspeed, {{n}}, appears above the rate pointer (60)", gs),
-                e6b.fmt("Find the fpm climb rate, {{n}}, on the inner scale", fpm),
-                e6b.fmt("Read the ft/nm climb gradiant, {{n}}, on the outer scale above {{n}}", fpnm, fpm)
+                e6b.fmt("Rotate until the groundspeed {{n}} kt appears above the rate pointer (60)", gs),
+                e6b.fmt("Find the climb rate {{n}} fpm on the inner scale", fpm),
+                e6b.fmt("Read the climb gradiant {{n}} ft/nm on the outer scale above {{n}}", fpnm, fpm)
             ]
         ];
     default:
         return [
-            e6b.fmt("Climb rate required (fpm): {{n}} kt groundspeed, {{n}} ft/nm gradiant", gs, fpnm),
-            e6b.fmt("{{n}} fpm required", fpm),
+            e6b.fmt("Climb rate required (fpm): {{n}} kt groundspeed, {{n}} ft/nm gradiant", gs, fpnm),
+            e6b.fmt("{{n}} fpm climb rate required", fpm),
             [
-                e6b.fmt("Rotate until the groundspeed, {{n}}, appears above the rate pointer (60)", gs),
-                e6b.fmt("Find the ft/nm climb gradiant, {{n}}, on the outer scale", fpnm),
-                e6b.fmt("Read the fpm climb rate, {{n}}, on the inner scale below {{n}}", fpm, fpnm)
+                e6b.fmt("Rotate until the groundspeed {{n}} kt appears above the rate pointer (60)", gs),
+                e6b.fmt("Find the climb gradiant {{n}} ft/nm on the outer scale", fpnm),
+                e6b.fmt("Read the climb rate {{n}} fpm on the inner scale below {{n}}", fpm, fpnm)
             ]
         ];
     }
@@ -522,35 +521,35 @@ e6b.problems.calc.advanced.off_course = function () {
     var dist_flown = e6b.rand(50, 200);
     var dist_remaining = e6b.rand(50, 200);
     var dist_off_course = e6b.rand(Math.round(dist_flown / 25), Math.round(dist_flown / 10));
-    var correction_1 = e6b.approx((dist_off_course / dist_flown) * 60);
-    var correction_2 = e6b.approx((dist_off_course / dist_remaining) * 60);
+    var heading_error = e6b.approx((dist_off_course / dist_flown) * 60);
+    var intercept_angle = e6b.approx((dist_off_course / dist_remaining) * 60);
 
     switch (e6b.rand(2)) {
     case 0:
         return [
-            e6b.fmt("Degrees off course: {{n}} nm off course after flying {{n}} nm",
+            e6b.fmt("Heading error (degrees): {{n}} nm off course after flying {{n}} nm",
                     dist_off_course, dist_flown),
-            e6b.fmt("{{n}}° off course", correction_1),
+            e6b.fmt("{{n}}° off course", heading_error),
             [
-                e6b.fmt("Find the distance off course, {{n}}, on the outer scale", dist_off_course),
-                e6b.fmt("Rotate until the distance flown, {{n}}, appears on the inner scale below {{n}}", dist_flown, dist_off_course),
-                e6b.fmt("Read the number of degrees off course, {{n}}, above the rate pointer (60)", correction_1)
+                e6b.fmt("Find the distance off course {{n}} nm on the outer scale", dist_off_course),
+                e6b.fmt("Rotate until the distance flown {{n}} nm appears on the inner scale below {{n}}", dist_flown, dist_off_course),
+                e6b.fmt("Read the heading error {{n}}° above the rate pointer (60)", heading_error)
             ]
         ];
     default:
         return [
-            e6b.fmt("Heading correction to destination: {{n}} nm off course after flying {{n}} nm, {{n}} nm remaining",
+            e6b.fmt("Heading correction to destination: {{n}} nm off course after flying {{n}} nm, {{n}} nm remaining",
                     dist_off_course, dist_flown, dist_remaining),
-            e6b.fmt("Total correction: {{n}}° ({{n}}° off course and {{n}}° to recapture)",
-                    correction_1 + correction_2, correction_1, correction_1),
+            e6b.fmt("Correction to intercept: {{n}}° ({{n}}° heading error and {{n}}° additional intercept angle)",
+                    heading_error + intercept_angle, heading_error, heading_error),
             [
-                e6b.fmt("Find the distance off course, {{n}}, on the outer scale", dist_off_course),
-                e6b.fmt("Rotate until the distance flown, {{n}}, appears on the inner scale below {{n}}", dist_flown, dist_off_course),
-                e6b.fmt("Read the number of degrees off course, {{n}}, above the rate pointer (60)", correction_1),
-                e6b.fmt("Rotate again, until the distance remaining, {{n}}, appears on the inner scale below {{n}}", dist_remaining, dist_off_course),
-                e6b.fmt("Read the additional heading adjustment to recapture, {{n}}, above the rate pointer (60)", correction_2),
-                e6b.fmt("Add {{n}} and {{n}} to get the total heading correction to destination, {{n}}°",
-                        correction_1, correction_2, correction_1+correction_2)
+                e6b.fmt("Find the distance off course {{n}}  on the outer scale", dist_off_course),
+                e6b.fmt("Rotate until the distance flown {{n}} nm appears on the inner scale below {{n}}", dist_flown, dist_off_course),
+                e6b.fmt("Read the heading error {{n}}° above the rate pointer (60)", heading_error),
+                e6b.fmt("Rotate again until the distance remaining {{n}}° appears on the inner scale below {{n}}", dist_remaining, dist_off_course),
+                e6b.fmt("Read the the intercept angle {{n}}° above the rate pointer (60)", intercept_angle),
+                e6b.fmt("Add {{n}}° heading error and {{n}}° intercept angle to get the total heading correction to destination {{n}}°",
+                        heading_error, intercept_angle, heading_error+intercept_angle)
             ]
         ];
     }
@@ -581,24 +580,24 @@ e6b.convert_volume = function () {
     switch (e6b.rand(0, 2)) {
     case 0:
         return [
-            e6b.fmt("Convert {{n}} US gallon(s) to litres", gallons),
-            e6b.fmt("{{n}} litres", litres),
+            e6b.fmt("Convert {{n}} US gallon(s) to litres", gallons),
+            e6b.fmt("{{n}} litres", litres),
             [
-                "Set the conversion ratio by placing the US gal pointer on the outer scale (near 13) above the litres pointer on the inner scale (near 50)",
-                e6b.fmt("Find the number of US gallons, {{n}}, on the outer scale", gallons),
-                e6b.fmt("Read the number of litres, {{n}}, on the inner scale directly below {{n}}",
-                        litres, gallons)
+                "Set the conversion ratio by placing the \"US gal\" pointer on the outer scale (near 13) above the \"litres\" " +
+                    "pointer on the inner scale (near 50)",
+                e6b.fmt("Find the {{n}} gallons on the outer scale", gallons),
+                e6b.fmt("Read {{n}} litres on the inner scale directly below {{n}}", litres, gallons)
             ]
         ];
     default:
         return [
-            e6b.fmt("Convert {{n}} litres to US gallons", litres),
-            e6b.fmt("{{n}} US gallons", gallons),
+            e6b.fmt("Convert {{n}} litres to US gallons", litres),
+            e6b.fmt("{{n}} US gallons", gallons),
             [
-                "Set the conversion ratio by placing the US gallons pointer on the outer scale (near 13) lines above the litres pointer on the inner scale (near 50)",
-                e6b.fmt("Find the number of litres, {{n}}, on the inner scale", litres),
-                e6b.fmt("Read the number of US gallons, {{n}}, on the outer scale directly above {{n}}",
-                        gallons, litres)
+                "Set the conversion ratio by placing the \"US gal\" pointer on the outer scale (near 13) above the \"litres\" " +
+                    "pointer on the inner scale (near 50)",
+                e6b.fmt("Find {{n}} litres on the inner scale", litres),
+                e6b.fmt("Read {{n}} US gallons on the outer scale directly above {{n}}", gallons, litres)
             ]
         ];
     }
@@ -611,22 +610,21 @@ e6b.convert_volume = function () {
 e6b.convert_distance = function () {
     var distance_nm = e6b.rand(10, 300);
     var values = [distance_nm, e6b.approx(distance_nm * 1.15078), e6b.approx(distance_nm * 1.852)];
-    var units = ["nautical miles", "statute miles", "kilometers"];
+    var units = ["nautical miles", "statute miles", "kilometers"];
     var locations = ["66", "76", "12"];
     var i = e6b.rand(0, 3);
     do {
         var j = e6b.rand(0, 3);
     } while (i == j);
     return [
-        e6b.fmt("Convert {{n}} {{s}} to {{s}}", values[i], units[i], units[j]),
-        e6b.fmt("{{n}} {{s}}", values[j], units[j]),
+        e6b.fmt("Convert {{n}} {{s}} to {{s}}", values[i], units[i], units[j]),
+        e6b.fmt("{{n}} {{s}}", values[j], units[j]),
         [
-            e6b.fmt("Set the conversion ratio by placing the {{s}} pointer on outer scale (near {{s}}) above the {{s}} pointer on the inner scale (near {{s}})",
+            e6b.fmt("Set the conversion ratio by placing the \"{{s}}\" pointer on outer scale (near {{s}}) " +
+                    "above the \"{{s}}\" pointer on the inner scale (near {{s}})",
                     units[i], locations[i], units[j], locations[j]),
-            e6b.fmt("Find the number of {{s}}, {{n}}, on the outer scale",
-                    units[i], values[i]),
-            e6b.fmt("Read the number of {{s}}, {{n}}, on the inner scale directly below {{n}}",
-                    units[j], values[j], values[i])
+            e6b.fmt("Find {{n}} {{s}} on the outer scale", values[i], units[i]),
+            e6b.fmt("Read the {{n}} {{s}} on the inner scale directly below {{n}}", values[j], units[j], values[i])
         ]
     ];
 };
@@ -644,9 +642,10 @@ e6b.convert_weight = function () {
             e6b.fmt("Convert {{n}} pounds to kilograms", lb),
             e6b.fmt("{{n}} kilograms", kg),
             [
-                "Set the conversion ratio by placing the kilograms pointer on the outer scale (near 17) above the pounds pointer on the inner scale (near 36)",
-                e6b.fmt("Find the number of kilograms, {{n}}, on the outer scale", kg),
-                e6b.fmt("Read the number of pounds, {{n}}, on the inner scale directly below {{n}}", lb, kg)
+                "Set the conversion ratio by placing the kilograms pointer on the outer scale (near 17) above " +
+                    "the pounds pointer on the inner scale (near 36)",
+                e6b.fmt("Find {{n}} kg on the outer scale", kg),
+                e6b.fmt("Read {{n}} lb on the inner scale directly below {{n}}", lb, kg)
             ]
         ];
     default:
@@ -654,9 +653,10 @@ e6b.convert_weight = function () {
             e6b.fmt("Convert {{n}} kilograms to pounds", kg),
             e6b.fmt("{{n}} pounds", lb),
             [
-                "Set the conversion ratio by placing the kilograms pointer on the outer scale (near 17) above the pounds pointer on the inner scale (near 36)",
-                e6b.fmt("Find the number of pounds, {{n}}, on the inner scale", lb),
-                e6b.fmt("Read the number of kilograms, {{n}}, on the outer scale directly above {{n}}", kg, lb)
+                "Set the conversion ratio by placing the kilograms pointer on the outer scale (near 17) above " +
+                    "the pounds pointer on the inner scale (near 36)",
+                e6b.fmt("Find {{n}} lb on the inner scale", lb),
+                e6b.fmt("Read {{n}} kg on the outer scale directly above {{n}}", kg, lb)
             ]
         ];
     }
@@ -672,22 +672,24 @@ e6b.convert_length = function () {
     switch (e6b.rand(0, 2)) {
     case 0:
         return [
-            e6b.fmt("Convert {{n}} feet to metres", feet),
-            e6b.fmt("{{n}} metres", metres),
+            e6b.fmt("Convert {{n}} feet to metres", feet),
+            e6b.fmt("{{n}} metres", metres),
             [
-                "Set the conversion ratio by placing the feet pointer on the outer scale (near 14) above the metres pointer on the inner scale (near 44)",
-                e6b.fmt("Find the number of feet, {{n}}, on the outer scale", feet),
-                e6b.fmt("Read the number of metres, {{n}}, on the inner scale directly below {{n}}", metres, feet)
+                "Set the conversion ratio by placing the feet pointer on the outer scale (near 14) above " +
+                    "the metres pointer on the inner scale (near 44)",
+                e6b.fmt("Find {{n}} feet on the outer scale", feet),
+                e6b.fmt("Read approximately {{n}} metres on the inner scale directly below {{n}}", metres, feet)
             ]
         ];
     default:
         return [
-            e6b.fmt("Convert {{n}} metres to feet", metres),
-            e6b.fmt("{{n}} feet", feet),
+            e6b.fmt("Convert {{n}} metres to feet", metres),
+            e6b.fmt("{{n}} feet", feet),
             [
-                "Set the conversion ratio by placing the feet pointer on the outer scale (near 14) above the metres pointer on the inner scale (near 44)",
-                e6b.fmt("Find the number of metres, {{n}}, on the inner scale", metres),
-                e6b.fmt("Read the number of feet, {{n}}, on the outer scale directly above {{n}}", feet, metres)
+                "Set the conversion ratio by placing the feet pointer on the outer scale (near 14) above " +
+                    "the metres pointer on the inner scale (near 44)",
+                e6b.fmt("Find {{n}} metres on the inner scale", metres),
+                e6b.fmt("Read approximately {{n}} ft on the outer scale directly above {{n}}", feet, metres)
             ]
         ];
     }
@@ -699,7 +701,7 @@ e6b.convert_length = function () {
  */
 e6b.convert_temperature = function () {
     var celsius = e6b.rand(-40, 40);
-    var fahrenheit = e6b.approx(celsius * (9.0 / 5) + 32);
+    var fahrenheit = Math.round(celsius * (9.0 / 5) + 32);
     switch (e6b.rand(0, 2)) {
     case 0:
         return [
@@ -709,7 +711,7 @@ e6b.convert_temperature = function () {
                 e6b.fmt("If your E6B has a temperature scale, simply read {{n}}°F adjacent to {{n}}°C; otherwise …",
                         fahrenheit, celsius),
                 "Set the conversion ratio by placing 36 on the outer scale above 20 on the inner scale",
-                e6b.fmt("Add 40 to {{n}} to get {{n}}, and find {{n}} on the inner scale",
+                e6b.fmt("Add 40 to {{n}}°C to get {{n}}, and find {{n}} on the inner scale",
                         celsius, celsius+40, celsius+40),
                 e6b.fmt("Read {{n}} on the outer scale above {{n}}, and subtract 40 to get {{n}}°F",
                         fahrenheit+40, celsius+40, fahrenheit)
@@ -723,7 +725,7 @@ e6b.convert_temperature = function () {
                 e6b.fmt("If your E6B has a temperature scale, simply read {{n}}°C adjacent to {{n}}°F; otherwise …",
                         celsius, fahrenheit),
                 "Set the conversion ratio by placing 36 on the outer scale above 20 on the inner scale",
-                e6b.fmt("Add 40 to {{n}} to get {{n}}, and find {{n}} on the outer scale", 
+                e6b.fmt("Add 40 to {{n}}°F to get {{n}}, and find {{n}} on the outer scale", 
                         fahrenheit, fahrenheit+40, fahrenheit+40),
                 e6b.fmt("Read {{n}} on the inner scale below {{n}}, and subtract 40 to get {{n}}°C",
                         celsius+40, fahrenheit+40, celsius)
@@ -755,22 +757,24 @@ e6b.misc_fuel_weight = function () {
     switch (e6b.rand(0, 2)) {
     case 0:
         return [
-            e6b.fmt("Weight in pounds: {{n}} US gallons of avgas at ISA sea level", gallons),
-            e6b.fmt("{{n}} pounds", lb),
+            e6b.fmt("Weight in pounds: {{n}} US gallons of avgas at ISA sea level", gallons),
+            e6b.fmt("{{n}} pounds", lb),
             [
-                "Set the conversion ratio by placing the fuel lbs pointer on the outer scale (near 77) above the US gallons pointer on the inner scale (near 13)",
-                e6b.fmt("Find the number of gallons, {{n}}, on the inner scale", gallons),
-                e6b.fmt("Read the number of pounds, {{n}}, on the outer scale directly above {{n}}", lb, gallons)
+                "Set the conversion ratio by placing the \"fuel lbs\" pointer on the outer scale (near 77) above "
+                    + "the \"US gallons\" pointer on the inner scale (near 13)",
+                e6b.fmt("Find {{n}} gallons on the inner scale", gallons),
+                e6b.fmt("Read {{n}} pounds on the outer scale directly above {{n}}", lb, gallons)
             ]
         ];
     default:
         return [
-            e6b.fmt("Volume in US gallons: {{n}} pounds of avgas at ISA sea level", lb),
-            e6b.fmt("{{n}} US gallons", gallons),
+            e6b.fmt("Volume in US gallons: {{n}} pounds of avgas at ISA sea level", lb),
+            e6b.fmt("{{n}} US gallons", gallons),
             [
-                "Set the conversion ratio by placing the fuel lbs pointer on the outer scale (near 77) above the US gallons pointer on the inner scale (near 13)",
-                e6b.fmt("Find the number of pounds, {{n}}, on the outer scale", lb),
-                e6b.fmt("Read the number of gallons, {{n}}, on the inner scale directly below {{n}}", gallons, lb)
+                "Set the conversion ratio by placing the \"fuel lbs\" pointer on the outer scale (near 77) above " +
+                    "the \"US gallons\" pointer on the inner scale (near 13)",
+                e6b.fmt("Find {{n}} pounds on the outer scale", lb),
+                e6b.fmt("Read {{n}} gallons on the inner scale directly below {{n}}", gallons, lb)
             ]
         ];
     }
@@ -789,7 +793,7 @@ e6b.misc_multiplication = function () {
         [
             e6b.fmt("Rotate so that the units pointer (10) on the inner scale is below {{n}} on the outer scale", n1),
             e6b.fmt("Find {{n}} on the inner scale", n2),
-            e6b.fmt("Read the approximate product, {{n}}, on the outer scale directly above {{n}}", e6b.approx(n1 * n2), n2)
+            e6b.fmt("Read the approximate product {{n}} on the outer scale directly above {{n}}", e6b.approx(n1 * n2), n2)
         ]
     ];
 };
@@ -807,7 +811,7 @@ e6b.misc_division = function () {
         [
             e6b.fmt("Find {{n}} on the outer scale", n1*n2),
             e6b.fmt("Rotate so that {{n}} appears on the inner scale directly below {{n}}", n1, n1*n2),
-            e6b.fmt("Read the quotient, {{n}}, on the outer scale directly above the units pointer (10)", n2)
+            e6b.fmt("Read the approximate quotient {{n}} on the outer scale directly above the units pointer (10)", n2)
         ]
     ];
 };
