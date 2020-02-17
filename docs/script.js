@@ -85,16 +85,29 @@ e6b.gen_wind_params = function () {
     // Derived values
     params.headwind = e6b.get_headwind(params.course, params.wind_dir, params.wind_speed);
     params.crosswind = e6b.get_crosswind(params.course, params.wind_dir, params.wind_speed);
-    params.groundspeed = e6b.get_effective_speed(params.true_airspeed, params.crosswind) - params.headwind;
+    params.effective_speed = e6b.get_effective_speed(params.true_airspeed, params.crosswind);
+    params.groundspeed = params.effective_speed - params.headwind;
     params.wind_correction_angle = e6b.get_wind_correction_angle(params.true_airspeed, params.crosswind);
     params.heading = (params.course + params.wind_correction_angle + 360) % 360;
 
-    if (params.wind_correction_angle < 0) {
-        params.wind_correction_dir = "left";
-        params.wind_correction_op = "subtract from";
+    if (params.headwind < 0) {
+        params.headwind_dir = "tailwind";
+        params.headwind_op = "add";
+        params.headwind_prep = "to";
     } else {
-        params.wind_correction_dir = "right";
-        params.wind_correction_op = "add to";
+        params.headwind_dir = "headwind";
+        params.headwind_op = "subtract";
+        params.headwind_prep = "from";
+    }
+
+    if (params.crosswind < 0) {
+        params.crosswind_dir = "left";
+        params.crosswind_op = "subtract";
+        params.crosswind_prep = "from";
+    } else {
+        params.crosswind_dir = "right";
+        params.crosswind_op = "add";
+        params.crosswind_prep = "to";
     }
 
     return params;
@@ -115,19 +128,18 @@ e6b.problems.wind.basic.heading = function () {
             e6b.fmt("Make a pencil mark {{n}} kt straight up from the centre grommet for the wind speed", params.wind_speed),
             e6b.fmt("Set the course, {{n}}, next to the \"true index\" or \"TC\" pointer", params.course),
             e6b.fmt("For a classic E6-B with a sliding card: slide until the pencil mark is over the true airspeed " +
-                    "{{n}}, read the wind-correction-angle {{n}} to the {{s}} under the pencil mark, and {{s}} " +
+                    "{{n}}, read the wind-correction-angle {{n}} to the {{s}} under the pencil mark, and {{s}} {{s}} " +
                     "the course {{n}} to get the heading {{n}}",
-                    params.true_airspeed, Math.abs(params.wind_correction_angle), params.wind_correction_dir,
-                    params.wind_correction_op, params.course, params.heading),
+                    params.true_airspeed, Math.abs(params.wind_correction_angle), params.crosswind_dir,
+                    params.crosswind_op, params.crosswind_prep, params.course, params.heading),
             e6b.fmt("For a CR-3/CR-5-style without a sliding card: place the true airspeed, {{n}}, above the \"TAS\" " +
                     "pointer, read the pencil mark's position {{n}} to the {{s}} on the centre horizontal crosswind scale, " +
                     "look up the crosswind {{n}} on the outer scale to get the course correction {{n}}° below it, " +
-                    "then {{s}} the course {{n}} to get the heading {{n}}",
-                    params.true_airspeed, Math.abs(params.crosswind), params.wind_correction_dir,
-                    Math.abs(params.crosswind), Math.abs(params.wind_correction_angle), params.wind_correction_op,
-                    params.course, params.heading)
-        ]
-                    
+                    "then {{s}} {{s}} the course {{n}} to get the heading {{n}}",
+                    params.true_airspeed, Math.abs(params.crosswind), params.crosswind_dir,
+                    Math.abs(params.crosswind), Math.abs(params.wind_correction_angle), params.crosswind_op,
+                    params.crosswind_prep, params.course, params.heading)
+        ]                    
     ];
 };
 
@@ -140,7 +152,25 @@ e6b.problems.wind.basic.groundspeed = function () {
     return [
         e6b.fmt("Groundspeed (kt): {{n}} kt true airspeed, course {{n}}°, wind from {{n}}° @ {{n}} kt",
                 params.true_airspeed, params.course, params.wind_dir, params.wind_speed),
-        e6b.fmt("{{n}} kt groundspeed", params.groundspeed)
+        e6b.fmt("{{n}} kt groundspeed", params.groundspeed),
+        [
+            e6b.fmt("Set the wind direction, {{n}}, under the \"true index\" or \"TC\" pointer", params.wind_dir),
+            e6b.fmt("Make a pencil mark {{n}} kt straight up from the centre grommet for the wind speed", params.wind_speed),
+            e6b.fmt("Set the course, {{n}}, next to the \"true index\" or \"TC\" pointer", params.course),
+            e6b.fmt("For a classic E6-B with a sliding card: slide until the pencil mark is over the true airspeed " +
+                    "{{n}}, then read the groundspeed {{n}} under the grommet",
+                    params.true_airspeed, params.groundspeed),
+            e6b.fmt("For a CR-3/CR-5-style without a sliding card: place the true airspeed, {{n}}, above the \"TAS\" " +
+                    "pointer, read the pencil mark's position {{n}} relative to the vertical scale to get the " +
+                    "{{s}} component, read the pencil mark's position {{n}} on the {{s}} side of the " +
+                    "horizontal scale to get the crosswind component, look up the crosswind on the outer scale " +
+                    "to get the wind-correction angle {{n}}, adjust the effective speed to {{n}} using the angle and the scale " +
+                    "to the left of the TAS pointer, then {{s}} the {{s}} {{n}} {{s}} the effective airspeed {{n}} " +
+                    "to get the groundspeed {{n}}",
+                    params.true_airspeed, Math.abs(params.headwind), params.headwind_dir, Math.abs(params.crosswind), params.crosswind_dir,
+                    Math.abs(params.wind_correction_angle), params.effective_speed, params.headwind_op, params.headwind_dir, params.headwind,
+                    params.headwind_prep, params.effective_speed, params.groundspeed)
+        ]
     ];
 };
 
