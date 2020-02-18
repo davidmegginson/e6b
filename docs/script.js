@@ -15,8 +15,9 @@ var e6b = {
         wind: {
             basic: {},
             advanced: {}
-        },
-	disabled: {}
+        }
+    },
+    compute: {
     },
     nodes: {}
 };
@@ -26,48 +27,6 @@ var e6b = {
 ////////////////////////////////////////////////////////////////////////
 // Problems for the wind side
 ////////////////////////////////////////////////////////////////////////
-
-
-/**
- * Basic trig to calculate a headwind
- */
-e6b.get_headwind = function (course, wind_dir, wind_speed) {
-    // use the cosine of the angle between the course and the wind
-    var cos = Math.cos((wind_dir - course) * (Math.PI / 180.0));
-    return e6b.approx(wind_speed * cos);
-};
-
-
-/**
- * Basic trig to calculate a crosswind.
- */
-e6b.get_crosswind = function (course, wind_dir, wind_speed) {
-    // use the sine of the angle between the course and the wind
-    var sin = Math.sin((wind_dir - course) * (Math.PI / 180.0));
-    return e6b.approx(wind_speed * sin);
-};
-
-
-/**
- * Calculate effective speed when in a crab.
- * FIXME: needs testing
- */
-e6b.get_effective_speed = function (true_airspeed, crosswind) {
-    // Use Pythagoras to compute the cosine
-    var cos = true_airspeed / Math.sqrt(true_airspeed * true_airspeed + crosswind * crosswind);
-    return e6b.approx(true_airspeed * cos);
-};
-
-
-/**
- * Calculate the wind-correction angle
- * FIXME: needs testing
- */
-e6b.get_wind_correction_angle = function (true_airspeed, crosswind) {
-    var cos = true_airspeed / Math.sqrt(true_airspeed * true_airspeed + crosswind * crosswind);
-    var dir = crosswind < 0 ? -1 : 1; // -1 for left, 1 for right
-    return e6b.approx(Math.acos(cos) *(180 / Math.PI)) * dir;
-};
 
 
 /**
@@ -83,11 +42,11 @@ e6b.gen_wind_params = function () {
     p.wspeed = e6b.rand(5, 40);
 
     // Derived values
-    p.headwind = e6b.get_headwind(p.course, p.wdir, p.wspeed);
-    p.crosswind = e6b.get_crosswind(p.course, p.wdir, p.wspeed);
-    p.espeed = e6b.get_effective_speed(p.tas, p.crosswind);
+    p.headwind = e6b.compute.headwind(p.course, p.wdir, p.wspeed);
+    p.crosswind = e6b.compute.crosswind(p.course, p.wdir, p.wspeed);
+    p.espeed = e6b.compute.effective_speed(p.tas, p.crosswind);
     p.gs = p.espeed - p.headwind;
-    p.wca = e6b.get_wind_correction_angle(p.tas, p.crosswind);
+    p.wca = e6b.compute.wind_correction_angle(p.tas, p.crosswind);
     p.heading = (p.course + p.wca + 360) % 360;
 
     if (p.headwind < 0) {
@@ -191,9 +150,9 @@ e6b.runway_wind_params = function () {
     p.course = p.runway * 10;
     p.wind_dir = (p.course + e6b.rand(-90, 90) + 360) % 360;
     p.wind_speed = e6b.rand(5, 30);
-    p.headwind = e6b.get_headwind(p.course, p.wind_dir, p.wind_speed);
+    p.headwind = e6b.compute.headwind(p.course, p.wind_dir, p.wind_speed);
     p.headwind_dir = (p.headwind < 0 ? "tailwind" : "headwind");
-    p.crosswind = e6b.get_crosswind(p.course, p.wind_dir, p.wind_speed);
+    p.crosswind = e6b.compute.crosswind(p.course, p.wind_dir, p.wind_speed);
     p.crosswind_dir = (p.crosswind < 0 ? "left" : "right");
     p.wind_angle = p.wind_dir - p.course;
     return p;
@@ -389,10 +348,10 @@ e6b.gen_density_alt = function () {
     var p = {};
     var oat_offset = e6b.rand(20, -20);
     p.palt = e6b.rand(1, 18) * 1000;
-    p.oat = 15 - (p.palt * 1.98 / 1000) + oat_offset;
-    p.dalt = e6b.density_altitude(p.palt, p.oat);
+    p.oat = Math.round(15 - (p.palt * 1.98 / 1000) + oat_offset);
+    p.dalt = e6b.compute.density_altitude(p.palt, p.oat);
     p.cas = e6b.rand(70, 250);
-    p.tas = Math.round(e6b.true_airspeed(p.cas, p.dalt));
+    p.tas = Math.round(e6b.compute.true_airspeed(p.cas, p.dalt));
     p.oat = Math.round(p.oat);
     return p;
 };
@@ -404,14 +363,14 @@ e6b.gen_density_alt = function () {
 e6b.problems.calc.advanced.density_alt = function () {
     var p = e6b.gen_density_alt();
     return [
-        e6b.fmt("Density altitude: {{n}} ft pressure altitude, {{n}}°c outside air temperature",
+        e6b.fmt("Density altitude (nearest 1,000 ft): {{n}} ft pressure altitude, {{n}}°c outside air temperature",
                 p.palt, p.oat),
-        e6b.fmt("{{n}} ft density altitude", e6b.approx(p.dalt)),
+        e6b.fmt("Approximately {{n}} ft density altitude", Math.round(p.dalt / 1000) * 1000),
         [
             e6b.fmt("In the bottom section of the True Airspeed window, line up {{n}} (thousand feet) pressure altitude with {{n}}°C",
                     Math.round(p.palt / 1000), p.oat),
             e6b.fmt("In the top section, read {{n}} (thousand feet) under the Density Altitude pointer",
-                    e6b.approx(p.dalt))
+                    Math.round(p.dalt / 1000) * 1000)
         ]
     ];
 };
@@ -635,7 +594,7 @@ e6b.convert_distance = function () {
  */
 e6b.convert_weight = function () {
     var lb = e6b.rand(10, 300);
-    var kg = e6b.approx(lb / 2.205);
+    var kg = Math.round(lb / 2.205 * 2) / 2;
     switch (e6b.rand(0, 2)) {
     case 0:
         return [
@@ -819,6 +778,73 @@ e6b.misc_division = function () {
 
 
 ////////////////////////////////////////////////////////////////////////
+// Computations
+////////////////////////////////////////////////////////////////////////
+
+/**
+ * Basic trig to calculate a headwind
+ */
+e6b.compute.headwind = function (course, wind_dir, wind_speed) {
+    // use the cosine of the angle between the course and the wind
+    var cos = Math.cos((wind_dir - course) * (Math.PI / 180.0));
+    return Math.round(wind_speed * cos);
+};
+
+
+/**
+ * Basic trig to calculate a crosswind.
+ */
+e6b.compute.crosswind = function (course, wind_dir, wind_speed) {
+    // use the sine of the angle between the course and the wind
+    var sin = Math.sin((wind_dir - course) * (Math.PI / 180.0));
+    return Math.round(wind_speed * sin);
+};
+
+
+/**
+ * Calculate effective speed when in a crab.
+ * FIXME: needs testing
+ */
+e6b.compute.effective_speed = function (true_airspeed, crosswind) {
+    // Use Pythagoras to compute the cosine
+    var cos = true_airspeed / Math.sqrt(true_airspeed * true_airspeed + crosswind * crosswind);
+    return Math.round(true_airspeed * cos);
+};
+
+
+/**
+ * Calculate the wind-correction angle
+ * FIXME: needs testing
+ */
+e6b.compute.wind_correction_angle = function (true_airspeed, crosswind) {
+    var cos = true_airspeed / Math.sqrt(true_airspeed * true_airspeed + crosswind * crosswind);
+    var dir = crosswind < 0 ? -1 : 1; // -1 for left, 1 for right
+    return Math.round(Math.acos(cos) *(180 / Math.PI)) * dir;
+};
+
+
+/**
+ * Calculate density altitude from pressure altitude and temperature.
+ */
+e6b.compute.density_altitude = function (pressure_altitude, temperature) {
+    var isa_temperature = 15 - ((pressure_altitude / 1000) * 1.98); // difference from ISO temperature
+    var offset = (temperature - isa_temperature) * 118.8;
+    return Math.round(pressure_altitude + offset);
+};
+
+
+/**
+ * Calculate true airspeed from calibrated airspeed and density altitude.
+ * Reverse engineered from the E6B
+ */
+e6b.compute.true_airspeed = function (calibrated_airspeed, density_altitude) {
+    var factor = 1 + ((density_altitude / 1000) * (0.012 + (density_altitude / 1000) * 0.0004)); // WRONG, but close
+    return Math.round(calibrated_airspeed * factor);
+};
+
+
+
+////////////////////////////////////////////////////////////////////////
 // Utility functions.
 ////////////////////////////////////////////////////////////////////////
 
@@ -970,27 +996,6 @@ e6b.input = function (event) {
     } else {
         e6b.show_problem();
     }
-};
-
-
-/**
- * Calculate density altitude from pressure altitude and temperature.
- * Reverse engineered from the E6B
- */
-e6b.density_altitude = function (pressure_altitude, temperature) {
-    var isa_temperature = 15 - ((pressure_altitude / 1000) * 1.98); // difference from ISO temperature
-    var offset = (temperature - isa_temperature) * 118.8;
-    return Math.round(pressure_altitude + offset);
-};
-
-
-/**
- * Calculate true airspeed from calibrated airspeed and density altitude.
- * Reverse engineered from the E6B
- */
-e6b.true_airspeed = function (calibrated_airspeed, density_altitude) {
-    var factor = 1 + ((density_altitude / 1000) * (0.012 + (density_altitude / 1000) * 0.0004)); // WRONG, but close
-    return calibrated_airspeed * factor;
 };
 
 
