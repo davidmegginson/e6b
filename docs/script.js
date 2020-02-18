@@ -827,8 +827,8 @@ e6b.compute.wind_correction_angle = function (true_airspeed, crosswind) {
  * Calculate density altitude from pressure altitude and temperature.
  */
 e6b.compute.density_altitude = function (pressure_altitude, temperature) {
-    var isa_temperature = 15 - ((pressure_altitude / 1000) * 1.98); // difference from ISO temperature
-    var offset = (temperature - isa_temperature) * 118.8;
+    var isa_temperature = 15 - ((pressure_altitude / 1000) * 2); // difference from ISO temperature
+    var offset = (temperature - isa_temperature) * 120;
     return Math.round(pressure_altitude + offset);
 };
 
