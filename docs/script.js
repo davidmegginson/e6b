@@ -102,7 +102,7 @@ e6b.problems.wind.basic.heading = function () {
 e6b.problems.wind.basic.groundspeed = function () {
     var p = e6b.gen_wind_params();
     return [
-        e6b.fmt("Groundspeed (kt): wind from {{n}}° @ {{n}} kt, course {{n}}°, {{n}} kt true airspeed",
+        e6b.fmt("Groundspeed (knots): wind from {{n}}° @ {{n}} kt, course {{n}}°, {{n}} kt true airspeed",
                 p.wdir, p.wspeed, p.course, p.tas),
         e6b.fmt("{{n}} kt groundspeed", p.gs),
         [
