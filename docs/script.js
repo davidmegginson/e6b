@@ -445,28 +445,28 @@ e6b.problems.calc.advanced.true_altitude = function () {
  * Calculator problem: rate of climb
  */
 e6b.problems.calc.advanced.vertical_speed = function () {
-    var fpm = e6b.rand(300, 1200);
+    var fpm = e6b.rand(30, 120) * 10;
     var gs = e6b.rand(50, 150);
-    var fpnm = Math.round(fpm * 60 / gs);
+    var fpnm = Math.round(fpm * 60 / gs / 10) * 10;
     switch (e6b.rand(0, 2)) {
     case 0:
         return [
             e6b.fmt("Climb gradiant (ft/nm): {{n}} kt groundspeed, {{n}} fpm climb rate", gs, fpm),
-            e6b.fmt("{{n}} ft/nm climb gradiant", fpnm),
+            e6b.fmt("Approximately {{n}} ft/nm climb gradiant", fpnm),
             [
                 e6b.fmt("Rotate until the groundspeed {{n}} kt appears above the rate pointer (60)", gs),
-                e6b.fmt("Find the climb rate {{n}} fpm on the inner scale", fpm),
-                e6b.fmt("Read the climb gradiant {{n}} ft/nm on the outer scale above {{n}}", fpnm, fpm)
+                e6b.fmt("Find the climb rate {{n}} fpm on the outer scale", fpm),
+                e6b.fmt("Read the approximate climb gradiant {{n}} ft/nm on the inner scale below {{n}}", fpnm, fpm)
             ]
         ];
     default:
         return [
             e6b.fmt("Climb rate required (fpm): {{n}} kt groundspeed, {{n}} ft/nm gradiant", gs, fpnm),
-            e6b.fmt("{{n}} fpm climb rate required", fpm),
+            e6b.fmt("Approximately {{n}} fpm climb rate required", fpm),
             [
                 e6b.fmt("Rotate until the groundspeed {{n}} kt appears above the rate pointer (60)", gs),
-                e6b.fmt("Find the climb gradiant {{n}} ft/nm on the outer scale", fpnm),
-                e6b.fmt("Read the climb rate {{n}} fpm on the inner scale below {{n}}", fpm, fpnm)
+                e6b.fmt("Find the climb gradiant {{n}} ft/nm on the inner scale", fpnm),
+                e6b.fmt("Read the approximate climb rate {{n}} fpm on the outer scale above {{n}}", fpm, fpnm)
             ]
         ];
     }
