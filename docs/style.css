@@ -1,10 +1,11 @@
 body {
     font-family: Helvetica, Arial, sanserif;
     margin: 0 1em;
+    color: #404040;
 }
 
 h1 {
-    font-size: 200%;
+    font-size: 172.8%;
     margin-left: 3.5ex;
     vertical-align: middle;
 }
@@ -39,7 +40,7 @@ img.logo {
     padding: 0;
     margin: .5ex .5ex .5ex 0;
     border-radius: 5px;
-    background: blue;
+    background: #000080;
 }
 
 .menu li a {
@@ -52,16 +53,15 @@ img.logo {
 }
 
 .menu li#show-advanced {
-    background: green;
+    background: #008000;
 }
 
 .menu li#hide-advanced {
-    background: red;
+    background: #800000;
 }
 
 .instructions {
     font-style: italic;
-    color: #333333;
 }
 
 #question, #answer {
@@ -86,10 +86,27 @@ img.logo {
 }
 
 #help {
-    color: #aaaaaa;
+    position: relative;
+    max-width: 30em;
+    background: #eeeeaa;
+    padding: 1ex 1em;
+    border: 1px solid #aaaaee;
+    border-radius: 1ex;
+    margin: 1ex 0;
+}
+
+#help h2 {
+    margin: 0 0 1ex 0;
+    font-size: 144%;
+}
+
+#help ol {
+    margin: 0;
+    padding: 0;
 }
 
 #help li {
     margin-bottom: 1ex;
+    margin-left: 1em;
 }
 
