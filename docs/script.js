@@ -451,7 +451,7 @@ e6b.problems.calc.advanced.vertical_speed = function () {
     switch (e6b.rand(0, 2)) {
     case 0:
         return [
-            e6b.fmt("Climb gradiant (ft/nm): {{n}} kt groundspeed, {{n}} fpm climb rate", gs, fpm),
+            e6b.fmt("Climb gradiant (nearest 10 ft/nm): {{n}} kt groundspeed, {{n}} fpm climb rate", gs, fpm),
             e6b.fmt("Approximately {{n}} ft/nm climb gradiant", fpnm),
             [
                 e6b.fmt("Rotate until the groundspeed {{n}} kt appears above the rate pointer (60)", gs),
@@ -461,7 +461,7 @@ e6b.problems.calc.advanced.vertical_speed = function () {
         ];
     default:
         return [
-            e6b.fmt("Climb rate required (fpm): {{n}} kt groundspeed, {{n}} ft/nm gradiant", gs, fpnm),
+            e6b.fmt("Climb rate required (nearest 10 fpm): {{n}} kt groundspeed, {{n}} ft/nm gradiant", gs, fpnm),
             e6b.fmt("Approximately {{n}} fpm climb rate required", fpm),
             [
                 e6b.fmt("Rotate until the groundspeed {{n}} kt appears above the rate pointer (60)", gs),
