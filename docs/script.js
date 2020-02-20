@@ -79,8 +79,8 @@ e6b.gen_wind_params = function () {
 e6b.problems.wind.basic.heading = function () {
     var p = e6b.gen_wind_params();
     return [
-        e6b.fmt("Heading: {{n}} kt true airspeed, course {{n}}°, wind from {{n}}° @ {{n}} kt",
-                p.tas, p.course, p.wdir, p.wspeed),
+        e6b.fmt("Heading: wind from {{n}}° @ {{n}} kt, course {{n}}°, {{n}} kt true airspeed",
+                p.wdir, p.wspeed, p.course, p.tas),
         e6b.fmt("Fly heading {{n}}°", p.heading),
         [
             e6b.fmt("Set the wind direction {{n}}° under the \"true index\" pointer", p.wdir),
@@ -102,8 +102,8 @@ e6b.problems.wind.basic.heading = function () {
 e6b.problems.wind.basic.groundspeed = function () {
     var p = e6b.gen_wind_params();
     return [
-        e6b.fmt("Groundspeed (kt): {{n}} kt true airspeed, course {{n}}°, wind from {{n}}° @ {{n}} kt",
-                p.tas, p.course, p.wdir, p.wspeed),
+        e6b.fmt("Groundspeed (kt): wind from {{n}}° @ {{n}} kt, course {{n}}°, {{n}} kt true airspeed",
+                p.wdir, p.wspeed, p.course, p.tas),
         e6b.fmt("{{n}} kt groundspeed", p.gs),
         [
             e6b.fmt("Rotate to set the wind direction {{n}}° under the \"true index\" pointer", p.wdir),
@@ -249,7 +249,7 @@ e6b.problems.calc.basic.speed = function () {
 e6b.problems.calc.basic.time = function () {
     var p = e6b.gen_dst_params();
     return [
-        e6b.fmt("Time enroute: travelling {{n}} nm at {{n}} kt", p.dist, p.speed),
+        e6b.fmt("Time enroute: {{n}} kt over {{n}} nm", p.speed, p.dist),
         e6b.fmt("{{t}} enroute", p.time),
         [
             e6b.fmt("Rotate until the airspeed {{n}} kt appears on the outer scale above the rate pointer (60)", p.speed),
@@ -312,7 +312,7 @@ e6b.problems.calc.basic.gph = function () {
 e6b.problems.calc.basic.fuel = function () {
     var p = e6b.gen_bef_params();
     return [
-        e6b.fmt("Fuel required (gallons): flying for {{t}}, consuming {{n}} gph", p.endurance, p.gph),
+        e6b.fmt("Fuel required (gallons): consuming {{n}} gph over {{t}}", p.gph, p.endurance),
         e6b.fmt("{{n}} gallons required", p.fuel),
         [
             e6b.fmt("Rotate until the fuel consumption {{n}} gph appears above the rate pointer (60)", p.gph),
@@ -329,7 +329,7 @@ e6b.problems.calc.basic.fuel = function () {
 e6b.problems.calc.basic.endurance = function () {
     var p = e6b.gen_bef_params();
     return [
-        e6b.fmt("Endurance: {{n}} gallons fuel onboard, consuming {{n}} gph", p.fuel, p.gph),
+        e6b.fmt("Endurance (time): consuming {{n}} gph with {{n}} gallons fuel onboard", p.gph, p.fuel),
         e6b.fmt("{{t}} endurance", p.endurance),
         [
             e6b.fmt("Rotate until the fuel consumption {{n}} gph appears above the rate pointer (60)", p.gph),
