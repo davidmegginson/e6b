@@ -990,11 +990,15 @@ e6b.show_problem = function () {
  * React to an input event (click, tap, key)
  */
 e6b.input = function (event) {
-    if (e6b.nodes.answer.hidden) {
-        e6b.nodes.answer.hidden = false;
-        e6b.nodes.help.hidden = !e6b.show_help;
+    if (!('tagName' in event.target && event.target.tagName.toLowerCase() == 'a')) {
+        if (e6b.nodes.answer.hidden) {
+            e6b.nodes.answer.hidden = false;
+            e6b.nodes.help.hidden = !e6b.show_help;
+        } else {
+            e6b.show_problem();
+        }
     } else {
-        e6b.show_problem();
+        console.log("Ignoring click on", event.target);
     }
 };
 
