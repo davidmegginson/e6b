@@ -9,21 +9,21 @@
   </head>
   <body>
     <header>
-      <h1>
-        <a href="index.html" title="Home"><img class="logo" alt="E6B logo" src="images/e6b-icon.png" /></a>
+      <h1 role="navigation" aria-label="Main navbar">
+        <a href="index.html" title="Home"><img role="logo" class="logo" alt="E6B logo" src="images/e6b-icon.png" /></a>
         E6B wind side
       </h1>
     </header>
     <main onclick="void(0)">
-      <p class="instructions">
-        Touch, click, or tap to continue. Assume consistent wind reference (true or magnetic). <b>You</b> decide whether
-        your answer is close enough.
-      </p>
-      <ul class="menu">
+      <ul role="navigation" aria-label="Difficulty level" class="menu">
         <li id="show-advanced"><a href="#advanced">Level: basic</a></li>
         <li id="hide-advanced"><a href="">Level: advanced</a></li>
         <li><a href="calc.html">&#x21BB; to calc side</a></li>
       </ul>
+      <p class="instructions">
+        Touch, click, or tap to continue. Assume consistent wind reference (true or magnetic). <b>You</b> decide whether
+        your answer is close enough.
+      </p>
       <p id="question">[Javascript required]</p>
       <p id="answer">[Javascript required]</p>
       <section id="help">

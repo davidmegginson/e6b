@@ -9,20 +9,20 @@
   </head>
   <body>
     <main onclick="void(0)">
-      <h1>
-        <a href="index.html" title="Home"><img class="logo" alt="E6B logo" src="images/e6b-icon.png" /></a>
+      <h1 role="navigation" aria-label="Main navbar">
+        <a href="index.html" title="Home"><img role="logo" class="logo" alt="E6B logo" src="images/e6b-icon.png" /></a>
         E6B calculator side
       </h1>
+      <ul role="navigation" aria-label="Difficulty level" class="menu">
+        <li id="show-advanced"><a href="#advanced">Level: basic</a></li>
+        <li id="hide-advanced"><a href="">Level: advanced</a></li>
+        <li><a href="wind.html">&#x21BB; to wind side</a></li>
+      </ul>
       <p class="instructions">
 	Touch, click, or tap to continue. Times are in
 	hours:minutes. Fuel is in US gallons. <b>You</b> decide whether your
 	answer is close enough.
       </p>
-      <ul class="menu">
-        <li id="show-advanced"><a href="#advanced">Level: basic</a></li>
-        <li id="hide-advanced"><a href="">Level: advanced</a></li>
-        <li><a href="wind.html">&#x21BB; to wind side</a></li>
-      </ul>
       <p id="question">[Javascript required]</p>
       <p id="answer">[Javascript required]</p>
       <section id="help">
