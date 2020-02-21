@@ -266,7 +266,7 @@ e6b.problems.calc.basic.time = function () {
 e6b.problems.calc.basic.dist = function () {
     var p = e6b.gen_dst_params();
     return [
-        e6b.fmt("Distance travelled: flying for {{t}} at {{n}} kt", p.time, p.speed),
+        e6b.fmt("Distance travelled: flying at {{n}} kt for {{t}}", p.speed, p.time),
         e6b.fmt("{{n}} nm travelled", p.dist),
         [
             e6b.fmt("Rotate until the speed {{n}} kt appears above the rate pointer (60)", p.speed),
@@ -295,7 +295,7 @@ e6b.gen_bef_params = function () {
 e6b.problems.calc.basic.gph = function () {
     var p = e6b.gen_bef_params();
     return [
-        e6b.fmt("Fuel-consumption rate (gph): used {{n}} gallons in {{t}}", p.fuel, p.endurance),
+        e6b.fmt("Fuel-consumption rate (gallons/hour): used {{n}} gallons in {{t}}", p.fuel, p.endurance),
         e6b.fmt("Consuming {{n}} gph", p.gph),
         [
             e6b.fmt("Find {{n}} gallons on the outer scale", p.fuel),
@@ -382,8 +382,8 @@ e6b.problems.calc.advanced.density_alt = function () {
 e6b.problems.calc.advanced.true_airspeed = function () {
     var p = e6b.gen_density_alt();
     return [
-        e6b.fmt("True airspeed (knots): {{n}} kt calibrated airspeed, {{n}} ft pressure altitude, {{n}}°C outside air temperature",
-                p.cas, p.palt, p.oat),
+        e6b.fmt("True airspeed (knots): {{n}} ft pressure altitude, {{n}}°C outside air temperature, {{n}} kt calibrated airspeed",
+                p.palt, p.oat, p.cas),
         e6b.fmt("{{n}} kt true airspeed", p.tas),
         [
             e6b.fmt("In the True Airspeed window, line up {{n}} (thousand feet) pressure altitude with {{n}}°C",
@@ -399,7 +399,6 @@ e6b.problems.calc.advanced.true_airspeed = function () {
  * Calculator problem: true altitude
  */
 e6b.problems.calc.advanced.true_altitude = function () {
-    // FIXME not quite matching E6B
     
     // station elevation, 0-5000 ft (500 ft increments)
     var station_elev = e6b.rand(0, 50) * 100;
@@ -407,11 +406,11 @@ e6b.problems.calc.advanced.true_altitude = function () {
     // indicated altitude, station alt + 3000-15000 ft (500-foot increments)
     var indicated_alt = (Math.ceil(station_elev / 500) * 500) + (e6b.rand(6, 30) * 500);
 
-    // pressure altitude +/- 0-1000 ft from indicated
-    var pressure_alt = indicated_alt + (e6b.rand(-100, 100) * 10);
+    // pressure altitude +/- 1,500 ft from indicated
+    var pressure_alt = indicated_alt + (e6b.rand(-3, 3) * 500);
 
     // expected ISA temperature at pressure altitude
-    var isa_temp = e6b.approx(15 - (pressure_alt / 1000 * 1.98));
+    var isa_temp = Math.round(15 - (pressure_alt / 1000 * 1.98));
 
     // randomised delta temperature, -20c to 20c
     var delta_temp = e6b.rand(-20, 20);
@@ -423,18 +422,18 @@ e6b.problems.calc.advanced.true_altitude = function () {
     var true_alt = e6b.approx(indicated_alt + ((indicated_alt - station_elev) / 1000 * delta_temp * 4));
 
     return [
-        e6b.fmt("True altitude: {{n}} ft indicated altitude, {{n}}°C OAT, {{n}} ft pressure altitude, {{n}} ft MSL station elevation",
-                indicated_alt, oat, pressure_alt, station_elev),
+        e6b.fmt("True altitude: {{n}} ft pressure altitude, {{n}}°C OAT, {{n}} ft indicated altitude, {{n}} ft MSL station elevation",
+                pressure_alt, oat, indicated_alt, station_elev),
         e6b.fmt("{{n}} ft true altitude", true_alt),
         [
-            e6b.fmt("Subtract {{n}} ft station elevation from {{n}} ft indicated altitude to get {{n}} ft indicated altitude above station",
-                    station_elev, indicated_alt, indicated_alt - station_elev),
             e6b.fmt("In the True Altitude window, line up {{n}} (thousand feet) pressure altitude with {{n}}°C",
                     Math.round(pressure_alt / 1000), oat),
+            e6b.fmt("Subtract {{n}} ft station elevation from {{n}} ft indicated altitude to get {{n}} ft indicated altitude above station",
+                    station_elev, indicated_alt, indicated_alt - station_elev),
             e6b.fmt("Find indicated altitude above station {{n}} ft on the main inner scale", indicated_alt - station_elev),
             e6b.fmt("Read approximate true altitude above station {{n}} ft on the outer scale above {{n}}",
                     e6b.approx(true_alt - station_elev), indicated_alt - station_elev),
-            e6b.fmt("Add {{n}} to the station elevation {{n}} to get the approximate true altitude, {{n}}",
+            e6b.fmt("Add {{n}} ft to the station elevation {{n}} ft to get the approximate true altitude, {{n}} ft",
                     e6b.approx(true_alt - station_elev), station_elev, true_alt)
         ]
     ];
@@ -492,7 +491,7 @@ e6b.problems.calc.advanced.off_course = function () {
             [
                 e6b.fmt("Find the distance off course {{n}} nm on the outer scale", dist_off_course),
                 e6b.fmt("Rotate until the distance flown {{n}} nm appears on the inner scale below {{n}}", dist_flown, dist_off_course),
-                e6b.fmt("Read the heading error {{n}}° above the rate pointer (60)", heading_error)
+                e6b.fmt("Read the approximate heading error {{n}}° above the rate pointer (60)", heading_error)
             ]
         ];
     default:
@@ -500,13 +499,14 @@ e6b.problems.calc.advanced.off_course = function () {
             e6b.fmt("Heading correction to destination: {{n}} nm off course after flying {{n}} nm, {{n}} nm remaining",
                     dist_off_course, dist_flown, dist_remaining),
             e6b.fmt("Correction to intercept: {{n}}° ({{n}}° heading error and {{n}}° additional intercept angle)",
-                    heading_error + intercept_angle, heading_error, heading_error),
+                    heading_error + intercept_angle, heading_error, intercept_angle),
             [
                 e6b.fmt("Find the distance off course {{n}}  on the outer scale", dist_off_course),
                 e6b.fmt("Rotate until the distance flown {{n}} nm appears on the inner scale below {{n}}", dist_flown, dist_off_course),
-                e6b.fmt("Read the heading error {{n}}° above the rate pointer (60)", heading_error),
-                e6b.fmt("Rotate again until the distance remaining {{n}}° appears on the inner scale below {{n}}", dist_remaining, dist_off_course),
-                e6b.fmt("Read the the intercept angle {{n}}° above the rate pointer (60)", intercept_angle),
+                e6b.fmt("Read the approximate heading error {{n}}° above the rate pointer (60)", heading_error),
+                e6b.fmt("Rotate again until the distance remaining {{n}}° appears on the inner scale below {{n}}",
+                        dist_remaining, dist_off_course),
+                e6b.fmt("Read the the approximate intercept angle {{n}}° above the rate pointer (60)", intercept_angle),
                 e6b.fmt("Add {{n}}° heading error and {{n}}° intercept angle to get the total heading correction to destination {{n}}°",
                         heading_error, intercept_angle, heading_error+intercept_angle)
             ]
