@@ -40,7 +40,7 @@ img.logo {
     padding: 0;
     margin: .5ex .5ex .5ex 0;
     border-radius: 5px;
-    background: #000080;
+    background: #000070;
 }
 
 .menu li a {
@@ -53,11 +53,11 @@ img.logo {
 }
 
 .menu li#show-advanced {
-    background: #008000;
+    background: #007000;
 }
 
 .menu li#hide-advanced {
-    background: #800000;
+    background: #700000;
 }
 
 .instructions {
