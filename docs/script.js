@@ -516,6 +516,31 @@ e6b.problems.calc.advanced.off_course = function () {
 
 
 /**
+ * Calculator problem: distance to navaid
+ */
+e6b.problems.calc.advanced.distance_to_navaid = function () {
+    var gs = e6b.rand(12, 31) * 5;
+    var angle = 10;
+    var time = e6b.rand(2, Math.round(gs / 25) * (angle / 5));
+    var xdist = Math.round((time / 60) * gs); // distance traversed
+    var dist = Math.round((60 / angle) * xdist); // distance to navaid
+    return [
+        e6b.fmt("Distance to navaid: flying perpendicular to the course to the navaid at {{n}} kt groundspeed for {{t}}, " +
+                "the bearing changes by {{n}}°", gs, time, angle),
+        e6b.fmt("Approximately {{n}} nm to the navaid", dist),
+        [
+            e6b.fmt("Calculate distance flown by setting the rate pointer (60) to {{n}} kt, " +
+                    "finding the time {{t}} on the inner scale, and reading {{n}} nm " +
+                    "above it on the outer scale.", gs, time, xdist),
+            e6b.fmt("Rotate so that the rate pointer (60) points to the bearing change, {{n}}°", angle),
+            e6b.fmt("Read the distance to the navaid, {{n}} nm on the inner scale, below {{n}} on the outer scale",
+                    dist, xdist)
+        ]
+    ];
+};
+
+
+/**
  * Conversions (all one function, so they don't come up too often)
  */
 e6b.problems.calc.advanced.conversions = function () {
