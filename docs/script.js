@@ -995,22 +995,49 @@ e6b.show_problem = function () {
             e6b.nodes.help_steps.appendChild(node);
         }
     }
-    
+
+    var info;
     var problems = {};
-    if (e6b.type == 'wind') {
-        if (location.hash == '#advanced') {
-            problems = Object.assign({}, e6b.problems.wind.basic, e6b.problems.wind.advanced);
+
+    if (["", "#", "#basic", "#advanced"].includes(location.hash)) {
+        if (e6b.type == 'wind') {
+            if (location.hash == '#advanced') {
+                problems = Object.assign({}, e6b.problems.wind.basic, e6b.problems.wind.advanced);
+            } else {
+                problems = e6b.problems.wind.basic;
+            }
         } else {
-            problems = e6b.problems.wind.basic;
+            if (location.hash == '#advanced') {
+                problems = Object.assign({}, e6b.problems.calc.basic, e6b.problems.calc.advanced);
+            } else {
+                problems = e6b.problems.calc.basic;
+            }
         }
+        info = e6b.rand_item(problems)();
     } else {
-        if (location.hash == '#advanced') {
-            problems = Object.assign({}, e6b.problems.calc.basic, e6b.problems.calc.advanced);
+        var f;
+        var key = location.hash.substr(1);
+        switch (e6b.type) {
+        case 'wind':
+            f = e6b.problems.wind.basic[key];
+            if (!f) {
+                f = e6b.problems.wind.advanced[key];
+            }
+            break;
+        case 'calc':
+            f = e6b.problems.calc.basic[key];
+            if (!f) {
+                f = e6b.problems.calc.advanced[key];
+            }
+            break;
+        }
+        if (f) {
+            info = f();
         } else {
-            problems = e6b.problems.calc.basic;
+            console.error("No problem " + key + " found for the " + e6b.type + " side");
+            return;
         }
     }
-    var info = e6b.rand_item(problems)();
     e6b.nodes.answer.hidden = true;
     e6b.nodes.question.textContent = info[0];
     e6b.nodes.answer.textContent = info[1];
