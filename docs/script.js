@@ -564,8 +564,8 @@ e6b.problems.calc.advanced.distance_to_navaid = function () {
             [
                 e6b.fmt("Rotate so that the rate pointer (60) points to the {{s}} change {{n}}°", bearing, angle),
                 e6b.fmt("Find the time traversed, {{t}} on the outer scale", xtime),
-                e6b.fmt("Read the approximate time to the {{s}}, {{t}}, on the inner scale below {{n}} on the outer scale",
-                        type, time, xtime)
+                e6b.fmt("Read the approximate time to the {{s}}, {{n}} ({{t}}), on the inner scale below {{n}} on the outer scale",
+                        type, time, time, xtime)
             ]
         ];
     }
