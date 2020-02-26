@@ -519,24 +519,56 @@ e6b.problems.calc.advanced.off_course = function () {
  * Calculator problem: distance to navaid
  */
 e6b.problems.calc.advanced.distance_to_navaid = function () {
+
+    // groundspeed and angle traversed
     var gs = e6b.rand(12, 31) * 5;
-    var angle = 10;
-    var time = e6b.rand(2, Math.round(gs / 25) * (angle / 5));
-    var xdist = Math.round((time / 60) * gs); // distance traversed
-    var dist = Math.round((60 / angle) * xdist); // distance to navaid
-    return [
-        e6b.fmt("Distance to navaid: flying perpendicular to the course to the navaid at {{n}} kt groundspeed for {{t}}, " +
-                "the bearing changes by {{n}}°", gs, time, angle),
-        e6b.fmt("Approximately {{n}} nm to the navaid", dist),
-        [
-            e6b.fmt("Calculate distance flown by setting the rate pointer (60) to {{n}} kt, " +
-                    "finding the time {{t}} on the inner scale, and reading {{n}} nm " +
-                    "above it on the outer scale.", gs, time, xdist),
-            e6b.fmt("Rotate so that the rate pointer (60) points to the bearing change, {{n}}°", angle),
-            e6b.fmt("Read the distance to the navaid, {{n}} nm on the inner scale, below {{n}} on the outer scale",
-                    dist, xdist)
-        ]
-    ];
+    var angle = e6b.rand(5, 15);
+
+    // traversal time/distance
+    var xtime = e6b.rand(2, Math.round(gs / 25) * (angle / 5));
+    var xdist = Math.round((xtime / 60) * gs);
+
+    // time/distance to navaid
+    var dist = Math.round((60 / angle) * xdist);
+    var time = Math.round((60 / angle) * xtime);
+
+    // choose a navaid type
+    if (e6b.rand(1, 2) == 1) {
+        var type = "VOR";
+        var bearing = "radial";
+    } else {
+        var type = "NDB";
+        var bearing = "bearing";
+    }
+
+    if (e6b.rand(1, 2) == 1) {
+        return [
+            e6b.fmt("Distance to {{s}}: {{n}} kt groundspeed, {{s}} changes by {{n}}° in {{t}} flying perpendicular to the {{s}}",
+                    type, gs, bearing, angle, xtime, bearing),
+            e6b.fmt("Approximately {{n}} nm to the {{s}}", dist, type),
+            [
+                e6b.fmt("Rotate so that the rate pointer (60) points to the groundspeed {{n}} kt", gs),
+                e6b.fmt("Find the traversal time {{t}} on the inner scale", xtime),
+                e6b.fmt("Read the traversal distance, {{n}} nm, on the outer scale above {{n}}",
+                        xdist, xtime),
+                e6b.fmt("Rotate so that the rate pointer (60) points to the {{s}} change {{n}}°", bearing, angle),
+                e6b.fmt("Read the approximate distance to the {{s}}, {{n}} nm, on the inner scale below {{n}} on the outer scale",
+                        type, dist, xdist)
+            ]
+        ];
+    } else {
+        return [
+            e6b.fmt("Time to {{s}} (no wind): {{s}} changes by {{n}}° in {{t}} flying perpendicular to the {{s}}",
+                    type, bearing, angle, xtime, bearing),
+            e6b.fmt("Approximately {{t}} to the {{s}}", time, type),
+            [
+                e6b.fmt("Rotate so that the rate pointer (60) points to the {{s}} change {{n}}°", bearing, angle),
+                e6b.fmt("Find the time traversed, {{t}} on the outer scale", xtime),
+                e6b.fmt("Read the approximate time to the {{s}}, {{t}}, on the inner scale below {{n}} on the outer scale",
+                        type, time, xtime)
+            ]
+        ];
+    }
 };
 
 
@@ -878,7 +910,7 @@ e6b.compute.true_airspeed = function (calibrated_airspeed, density_altitude) {
  * Generate a random number between min and max-1
  */
 e6b.rand = function(min, max) {
-    return Math.floor(Math.random() * (max - min) + min)
+    return Math.round(Math.random() * (max - min) + min)
 };
 
 
