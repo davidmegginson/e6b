@@ -36,9 +36,9 @@ e6b.gen_wind_params = function () {
     var p = {};
 
     // Randomly-generated values
-    p.course = e6b.rand(0, 360);
+    p.course = e6b.rand(1, 360);
     p.tas = e6b.rand(60, 180);
-    p.wdir = e6b.rand(0, 36) * 10;
+    p.wdir = e6b.rand(1, 36) * 10;
     p.wspeed = e6b.rand(5, 40);
 
     // Derived values
@@ -146,7 +146,7 @@ e6b.problems.wind.advanced.wind_aloft = function () {
  */
 e6b.runway_wind_params = function () {
     var p = {};
-    p.runway = e6b.rand(0, 36) + 1;
+    p.runway = e6b.rand(1, 36);
     p.course = p.runway * 10;
     p.wind_dir = (p.course + e6b.rand(-90, 90) + 360) % 360;
     p.wind_speed = e6b.rand(5, 30);
