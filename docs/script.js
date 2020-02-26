@@ -419,7 +419,7 @@ e6b.problems.calc.advanced.true_altitude = function () {
     var oat = isa_temp + delta_temp;
     
     // true altitude (rounded to the nearest 100 feet)
-    var true_alt = e6b.approx(indicated_alt + ((indicated_alt - station_elev) / 1000 * delta_temp * 4));
+    var true_alt = Math.round(indicated_alt + ((indicated_alt - station_elev) / 1000 * delta_temp * 4) / 100) * 100;
 
     return [
         e6b.fmt("True altitude: {{n}} ft pressure altitude, {{n}}°C OAT, {{n}} ft indicated altitude, {{n}} ft MSL station elevation",
@@ -432,9 +432,9 @@ e6b.problems.calc.advanced.true_altitude = function () {
                     station_elev, indicated_alt, indicated_alt - station_elev),
             e6b.fmt("Find indicated altitude above station {{n}} ft on the main inner scale", indicated_alt - station_elev),
             e6b.fmt("Read approximate true altitude above station {{n}} ft on the outer scale above {{n}}",
-                    e6b.approx(true_alt - station_elev), indicated_alt - station_elev),
+                    Math.round((true_alt - station_elev) / 100) * 100, indicated_alt - station_elev),
             e6b.fmt("Add {{n}} ft to the station elevation {{n}} ft to get the approximate true altitude, {{n}} ft",
-                    e6b.approx(true_alt - station_elev), station_elev, true_alt)
+                    Math.round((true_alt - station_elev) / 100) * 100, station_elev, true_alt)
         ]
     ];
 };
@@ -479,8 +479,8 @@ e6b.problems.calc.advanced.off_course = function () {
     var dist_flown = e6b.rand(50, 200);
     var dist_remaining = e6b.rand(50, 200);
     var dist_off_course = e6b.rand(Math.round(dist_flown / 25), Math.round(dist_flown / 10));
-    var heading_error = e6b.approx((dist_off_course / dist_flown) * 60);
-    var intercept_angle = e6b.approx((dist_off_course / dist_remaining) * 60);
+    var heading_error = Math.round((dist_off_course / dist_flown) * 60);
+    var intercept_angle = Math.round((dist_off_course / dist_remaining) * 60);
 
     switch (e6b.rand(2)) {
     case 0:
@@ -592,7 +592,7 @@ e6b.problems.calc.advanced.conversions = function () {
  */
 e6b.convert_volume = function () {
     var gallons = e6b.rand(30, 1500) / 10.0; // one decimal place
-    var litres = e6b.approx(gallons * 3.78541);
+    var litres = Math.round(gallons * 3.78541);
     switch (e6b.rand(0, 2)) {
     case 0:
         return [
@@ -625,7 +625,7 @@ e6b.convert_volume = function () {
  */
 e6b.convert_distance = function () {
     var distance_nm = e6b.rand(10, 300);
-    var values = [distance_nm, e6b.approx(distance_nm * 1.15078), e6b.approx(distance_nm * 1.852)];
+    var values = [distance_nm, Math.round(distance_nm * 1.15078), Math.round(distance_nm * 1.852)];
     var units = ["nautical miles", "statute miles", "kilometers"];
     var locations = ["66", "76", "12"];
     var i = e6b.rand(0, 3);
@@ -684,7 +684,7 @@ e6b.convert_weight = function () {
  */
 e6b.convert_length = function () {
     var feet = e6b.rand(10, 800) * 10;
-    var metres = e6b.approx(feet / 3.281);
+    var metres = Math.round(feet / 3.281);
     switch (e6b.rand(0, 2)) {
     case 0:
         return [
@@ -769,7 +769,7 @@ e6b.problems.calc.advanced.misc = function () {
  */
 e6b.misc_fuel_weight = function () {
     var lb = e6b.rand(30, 900);
-    var gallons = e6b.approx(lb / 6.01 * 10) / 10;
+    var gallons = Math.round(lb / 6.01 * 10) / 10;
     switch (e6b.rand(0, 2)) {
     case 0:
         return [
@@ -804,12 +804,12 @@ e6b.misc_multiplication = function () {
     var n1 = e6b.rand(3, 99);
     var n2 = e6b.rand(3, 99);
     return [
-        e6b.fmt("{{n}} × {{n}} =", n1, n2),
-        e6b.fmt("(approximately) {{n}}", e6b.approx(n1 * n2)),
+        e6b.fmt("{{n}} × {{n}} = ?", n1, n2),
+        e6b.fmt("{{n}}", Math.round(n1 * n2)),
         [
             e6b.fmt("Rotate so that the units pointer (10) on the inner scale is below {{n}} on the outer scale", n1),
             e6b.fmt("Find {{n}} on the inner scale", n2),
-            e6b.fmt("Read the approximate product {{n}} on the outer scale directly above {{n}}", e6b.approx(n1 * n2), n2)
+            e6b.fmt("Read the product {{n}} on the outer scale directly above {{n}}", Math.round(n1 * n2), n2)
         ]
     ];
 };
@@ -822,12 +822,12 @@ e6b.misc_division = function () {
     var n1 = e6b.rand(3, 9);
     var n2 = e6b.rand(3, 99);
     return [
-        e6b.fmt("{{n}} ÷ {{n}} =", n1 * n2, n1),
+        e6b.fmt("{{n}} ÷ {{n}} = ?", n1 * n2, n1),
         e6b.fmt("{{n}}", n2),
         [
             e6b.fmt("Find {{n}} on the outer scale", n1*n2),
             e6b.fmt("Rotate so that {{n}} appears on the inner scale directly below {{n}}", n1, n1*n2),
-            e6b.fmt("Read the approximate quotient {{n}} on the outer scale directly above the units pointer (10)", n2)
+            e6b.fmt("Read the quotient {{n}} on the outer scale directly above the units pointer (10)", n2)
         ]
     ];
 };
@@ -912,23 +912,6 @@ e6b.compute.true_airspeed = function (calibrated_airspeed, density_altitude) {
 e6b.rand = function(min, max) {
     return Math.round(Math.random() * (max - min) + min)
 };
-
-
-/**
- * Approximate a value based on order of magnitude.
- */
-e6b.approx = function (n) {
-    // FIXME - there's probably an elegant way to do this
-    if (n > 10000) {
-        return Math.round(n / 1000) * 1000;
-    } else if (n > 1000) {
-        return Math.round(n / 100) * 100;
-    } else if (n > 100) {
-        return Math.round(n / 10) * 10;
-    } else {
-        return Math.round(n);
-    }
-}
 
 
 /**
@@ -1054,25 +1037,7 @@ e6b.input = function (event) {
         } else {
             e6b.show_problem();
         }
-    } else {
-        console.log("Ignoring click on", event.target);
     }
-};
-
-
-e6b.setup_advanced = function () {
-    var show_node = document.getElementById('show-advanced');
-    var hide_node = document.getElementById('hide-advanced');
-
-    function toggle_visibility () {
-        var is_advanced = (location.hash == '#advanced');
-        show_node.style.display = (is_advanced ? 'none' : 'block');
-        hide_node.style.display = (is_advanced ? 'block' : 'none');
-    }
-
-    window.addEventListener('hashchange', toggle_visibility);
-    
-    toggle_visibility();
 };
 
 
@@ -1082,6 +1047,22 @@ e6b.setup_advanced = function () {
 ////////////////////////////////////////////////////////////////////////
 
 window.addEventListener('load', function () {
+
+    function setup_advanced_toggle () {
+        var show_node = document.getElementById('show-advanced');
+        var hide_node = document.getElementById('hide-advanced');
+
+        function toggle_visibility () {
+            var is_advanced = (location.hash == '#advanced');
+            show_node.style.display = (is_advanced ? 'none' : 'block');
+            hide_node.style.display = (is_advanced ? 'block' : 'none');
+        }
+
+        window.addEventListener('hashchange', toggle_visibility);
+        
+        toggle_visibility();
+    };
+
 
     // Add listeners for user input
     document.addEventListener('click', e6b.input, { 'passive': false });
@@ -1094,7 +1075,7 @@ window.addEventListener('load', function () {
     e6b.nodes.help_steps = document.getElementById("help-steps");
 
     // Setup basic/advanced toggle
-    e6b.setup_advanced();
+    setup_advanced_toggle();
 
     // Show the first problem
     e6b.show_problem();
