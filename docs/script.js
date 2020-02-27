@@ -419,12 +419,12 @@ e6b.problems.calc.advanced.true_altitude = function () {
     var oat = isa_temp + delta_temp;
     
     // true altitude (rounded to the nearest 100 feet)
-    var true_alt = Math.round(indicated_alt + ((indicated_alt - station_elev) / 1000 * delta_temp * 4) / 100) * 100;
+    var true_alt = Math.round((indicated_alt + ((indicated_alt - station_elev) / 1000 * delta_temp * 4)) / 100) * 100;
 
     return [
-        e6b.fmt("True altitude: {{n}} ft pressure altitude, {{n}}°C OAT, {{n}} ft indicated altitude, {{n}} ft MSL station elevation",
+        e6b.fmt("True altitude (nearest 100 ft): {{n}} ft pressure altitude, {{n}}°C OAT, {{n}} ft indicated altitude, {{n}} ft MSL station elevation",
                 pressure_alt, oat, indicated_alt, station_elev),
-        e6b.fmt("{{n}} ft true altitude", true_alt),
+        e6b.fmt("Approximately {{n}} ft true altitude", true_alt),
         [
             e6b.fmt("In the True Altitude window, line up {{n}} (thousand feet) pressure altitude with {{n}}°C",
                     Math.round(pressure_alt / 1000), oat),
