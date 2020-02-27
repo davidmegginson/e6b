@@ -401,13 +401,13 @@ e6b.problems.calc.advanced.true_airspeed = function () {
 e6b.problems.calc.advanced.true_altitude = function () {
     
     // station elevation, 0-5000 ft (500 ft increments)
-    var station_elev = e6b.rand(0, 50) * 100;
+    var station_elev = e6b.rand(1, 50) * 100;
 
     // indicated altitude, station alt + 3000-15000 ft (500-foot increments)
     var indicated_alt = (Math.ceil(station_elev / 500) * 500) + (e6b.rand(6, 30) * 500);
 
     // pressure altitude +/- 1,500 ft from indicated
-    var pressure_alt = indicated_alt + (e6b.rand(-3, 3) * 500);
+    var pressure_alt = indicated_alt + (e6b.rand(-2, 2) * 500);
 
     // expected ISA temperature at pressure altitude
     var isa_temp = Math.round(15 - (pressure_alt / 1000 * 1.98));
