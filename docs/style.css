@@ -1,6 +1,8 @@
 body {
     font-family: Helvetica, Arial, sanserif;
-    margin: 0 1em;
+    margin: 0 auto;
+    width: 90%;
+    max-width: 640px;
     color: #404040;
 }
 
@@ -86,8 +88,6 @@ img.logo {
 }
 
 #help {
-    position: relative;
-    max-width: 30em;
     background: #eeeeaa;
     padding: 1ex 1em;
     border: 1px solid #aaaaee;
