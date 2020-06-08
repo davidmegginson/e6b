@@ -907,6 +907,14 @@ e6b.compute.true_airspeed = function (calibrated_airspeed, density_altitude) {
 
 
 /**
+ * Check if we're locked to a specific problem type
+ */
+e6b.is_locked = function () {
+    return !["", "#", "#basic", "#advanced"].includes(location.hash);
+};
+
+
+/**
  * Generate a random number between min and max-1
  */
 e6b.rand = function(min, max) {
@@ -917,9 +925,9 @@ e6b.rand = function(min, max) {
 /**
  * Choose a random item from an object/dict
  */
-e6b.rand_item = function (obj) {
+e6b.rand_key = function (obj) {
     var keys = Object.keys(obj);
-    return obj[keys[keys.length * Math.random() << 0]];
+    return keys[keys.length * Math.random() << 0];
 };
 
 
@@ -982,7 +990,6 @@ e6b.fmt = function (fmt) {
 // Top-level logic
 ////////////////////////////////////////////////////////////////////////
 
-
 /**
  * Ask the next question.
  */
@@ -999,7 +1006,7 @@ e6b.show_problem = function () {
     var info;
     var problems = {};
 
-    if (["", "#", "#basic", "#advanced"].includes(location.hash)) {
+    if (!e6b.is_locked()) {
         if (e6b.type == 'wind') {
             if (location.hash == '#advanced') {
                 problems = Object.assign({}, e6b.problems.wind.basic, e6b.problems.wind.advanced);
@@ -1013,10 +1020,13 @@ e6b.show_problem = function () {
                 problems = e6b.problems.calc.basic;
             }
         }
-        info = e6b.rand_item(problems)();
+        var key = e6b.rand_key(problems);
+        e6b.update_key(key);
+        info = problems[key]();
     } else {
         var f;
         var key = location.hash.substr(1);
+        e6b.update_key(key);
         switch (e6b.type) {
         case 'wind':
             f = e6b.problems.wind.basic[key];
@@ -1050,6 +1060,22 @@ e6b.show_problem = function () {
     } else {
         e6b.show_help = false;
     }
+};
+
+
+/**
+ * Update for a new key.
+ */
+e6b.update_key = function (key) {
+    var node = document.getElementById('lock-link');
+    var url = node.getAttribute("href");
+
+    // update the #lock element so that we can lock to this problem
+    if (url.indexOf('#') >= 0) {
+        url = url.substring(0, url.indexOf('#'));
+    }
+    url += '#' + key;
+    node.setAttribute("href", url);
 };
 
 
@@ -1088,7 +1114,22 @@ window.addEventListener('load', function () {
         window.addEventListener('hashchange', toggle_visibility);
         
         toggle_visibility();
-    };
+    }
+
+    function setup_lock_toggle () {
+        var lock_node = document.getElementById('lock');
+        var unlock_node = document.getElementById('unlock');
+
+        function toggle_visibility () {
+            var is_locked = e6b.is_locked();
+            lock_node.style.display = (is_locked ? 'none' : 'block');
+            unlock_node.style.display = (is_locked ? 'block' : 'none');
+        }
+
+        window.addEventListener('hashchange', toggle_visibility);
+
+        toggle_visibility();
+    }
 
 
     // Add listeners for user input
@@ -1103,6 +1144,7 @@ window.addEventListener('load', function () {
 
     // Setup basic/advanced toggle
     setup_advanced_toggle();
+    setup_lock_toggle();
 
     // Show the first problem
     e6b.show_problem();

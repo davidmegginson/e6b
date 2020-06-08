@@ -20,46 +20,44 @@ img.logo {
 }
 
 .menu {
-    display: block;
+    display: flex;
     width: 100%;
-    list-style-type: none;
-    margin: .5ex 0;
+    margin: 0;
     padding: 0;
-}
-
-.menu:after {
-    clear: both;
-    display: block;
-    visibility: hidden;
-    height: 0;
-    content: ".";
-}
-
-.menu li {
-    float: left;
-    display: block;
-    text-align: center;
-    padding: 0;
-    margin: .5ex .5ex .5ex 0;
-    border-radius: 5px;
-    background: #000070;
+    justify-content: space-between;
+    list-style: none;
 }
 
 .menu li a {
-    display: inline-block;
+    padding: 0;
+    margin: 0;
+    display: block;
+    border-radius: 5px;
+    background: #000070;
     color: #ffffff;
-    min-width: 8em;
     text-align: center;
-    padding: .5ex;
     text-decoration: none;
+    min-width: 8em;
+    line-height: 3ex;
+    vertical-align: middle;
 }
 
-.menu li#show-advanced {
+.menu li#show-advanced a {
     background: #007000;
 }
 
-.menu li#hide-advanced {
+.menu li#hide-advanced a {
     background: #700000;
+}
+
+.menu li#lock a {
+    background: #ffffff;
+    color: #404040;
+    border: #404040 1px solid;
+}
+
+.menu li#unlock a {
+    background: #404040;
 }
 
 .instructions {
