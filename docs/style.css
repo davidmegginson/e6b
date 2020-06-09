@@ -28,32 +28,34 @@ img.logo {
     list-style: none;
 }
 
-.menu li a {
-    padding: 0;
+.menu li {
+    padding: 0 5px;
     margin: 0;
     display: block;
     border-radius: 5px;
     background: #000070;
-    color: #ffffff;
     text-align: center;
     text-decoration: none;
-    min-width: 8em;
     line-height: 3ex;
     vertical-align: middle;
 }
 
-.menu li#show-advanced a {
+.menu li a {
+    text-decoration: none;
+    color: #ffffff;
+}
+
+.menu li#show-advanced {
     background: #007000;
 }
 
-.menu li#hide-advanced a {
+.menu li#hide-advanced {
     background: #700000;
 }
 
-.menu li#lock a {
+.menu li#lock {
     background: #ffffff;
     color: #404040;
-    border: #404040 1px solid;
 }
 
 .menu li#unlock a {
