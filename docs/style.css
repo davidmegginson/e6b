@@ -21,16 +21,17 @@ img.logo {
 
 .menu {
     display: flex;
+    margin-left: -8px;
     width: 100%;
     margin: 0;
     padding: 0;
-    justify-content: space-between;
     list-style: none;
 }
 
 .menu li {
     padding: 0 5px;
     margin: 0;
+    margin-left: 8px;
     display: block;
     border-radius: 5px;
     background: #000070;
