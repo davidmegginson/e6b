@@ -935,7 +935,6 @@ e6b.rand_key = function (obj, last_key) {
     var key;
     do {
         key = keys[keys.length * Math.random() << 0];
-        console.log(key, last_key);
     } while (last_key && key == last_key);
     return key;
 };
