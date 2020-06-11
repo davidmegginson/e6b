@@ -924,10 +924,20 @@ e6b.rand = function(min, max) {
 
 /**
  * Choose a random item from an object/dict
+ *
+ * If last_key is specified, avoid repetition.
+ *
+ * @param obj: the object (associated array) to choose a key from.
+ * @param last_key: (optional) don't repeat this key
  */
-e6b.rand_key = function (obj) {
+e6b.rand_key = function (obj, last_key) {
     var keys = Object.keys(obj);
-    return keys[keys.length * Math.random() << 0];
+    var key;
+    do {
+        key = keys[keys.length * Math.random() << 0];
+        console.log(key, last_key);
+    } while (last_key && key == last_key);
+    return key;
 };
 
 
@@ -1020,7 +1030,7 @@ e6b.show_problem = function () {
                 problems = e6b.problems.calc.basic;
             }
         }
-        var key = e6b.rand_key(problems);
+        var key = e6b.rand_key(problems, e6b.current_key);
         e6b.update_key(key);
         info = problems[key]();
     } else {
@@ -1076,6 +1086,8 @@ e6b.update_key = function (key) {
     }
     url += '#' + key;
     node.setAttribute("href", url);
+
+    e6b.current_key = key;
 };
 
 
