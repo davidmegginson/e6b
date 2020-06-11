@@ -504,7 +504,7 @@ e6b.problems.calc.advanced.off_course = function () {
                 e6b.fmt("Find the distance off course {{n}}  on the outer scale", dist_off_course),
                 e6b.fmt("Rotate until the distance flown {{n}} nm appears on the inner scale below {{n}}", dist_flown, dist_off_course),
                 e6b.fmt("Read the approximate heading error {{n}}° above the rate pointer (60)", heading_error),
-                e6b.fmt("Rotate again until the distance remaining {{n}}° appears on the inner scale below {{n}}",
+                e6b.fmt("Rotate again until the distance remaining {{n}} nm appears on the inner scale below {{n}}",
                         dist_remaining, dist_off_course),
                 e6b.fmt("Read the the approximate intercept angle {{n}}° above the rate pointer (60)", intercept_angle),
                 e6b.fmt("Add {{n}}° heading error and {{n}}° intercept angle to get the total heading correction to destination {{n}}°",
